@@ -1,6 +1,7 @@
 ---
 export interface Props {
   id: string;
+  title?: string;
   personal: string;
   contact: string;
   date_posted: string;
@@ -8,7 +9,7 @@ export interface Props {
   location?: string;
 }
 
-const { id, personal, contact, date_posted, category, location } = Astro.props;
+const { id, title, personal, contact, date_posted, category, location } = Astro.props;
 
 // Format date
 const formattedDate = new Date(date_posted).toLocaleDateString('en-US', {
@@ -17,10 +18,12 @@ const formattedDate = new Date(date_posted).toLocaleDateString('en-US', {
   day: 'numeric'
 });
 
-// Generate a "headline" from the first 6-8 words
-const words = personal.split(' ');
-const headline = words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
-const rest = words.slice(8).join(' ');
+// Use the title if present, otherwise generate from the first 8 words
+let headline = title;
+if (!headline) {
+  const words = personal.split(' ');
+  headline = words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
+}
 
 // Byline: location • date
 const byline = [location ? location.toUpperCase() : null, formattedDate].filter(Boolean).join(' • ');
@@ -38,7 +41,7 @@ const byline = [location ? location.toUpperCase() : null, formattedDate].filter(
   </h2>
   <!-- Body -->
   <p class="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-sans mb-5" style="font-family: 'Inter', system-ui, sans-serif;">
-    {rest}
+    {personal}
   </p>
   <!-- Tags -->
   <div class="flex flex-wrap gap-2 mb-5">
