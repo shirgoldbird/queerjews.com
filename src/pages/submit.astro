@@ -16,114 +16,26 @@ import Footer from '../components/Footer.astro';
           
           <div class="submit-content">
             <p class="submit-text">
-              Share your story and connect with the queer Jewish community. We welcome personals for dating, friendship, community building, and meaningful connections.
+              Submit your personal using the form below. You can also <a href="https://forms.gle/GQVZVUGYQDMdUSTH8" target="_blank">click here</a> to open the form in a new tab.
+            </p>
+              
+            <p class="submit-text">
+              Questions or issues? Reach out to Shir: <a href="mailto:shadchan@queerjews.com">shadchan@queerjews.com</a>.
             </p>
             
-            <div class="submit-form-wrapper">
-              <form class="submit-form" action="https://formspree.io/f/your-form-id" method="POST">
-                <!-- Personal Ad Content -->
-                <div class="form-section">
-                  <label for="personal-content" class="form-label">
-                    Your Personal Ad *
-                  </label>
-                  <textarea
-                    id="personal-content"
-                    name="personal"
-                    rows="8"
-                    required
-                    placeholder="Tell us about yourself, your interests, what you're looking for, and what makes you unique. Be authentic and specific!"
-                    class="form-textarea"
-                  ></textarea>
-                  <p class="form-help">
-                    Share your story, interests, values, and what you're seeking. The more specific and authentic, the better!
-                  </p>
-                </div>
-                
-                <!-- Contact Information -->
-                <div class="form-section">
-                  <label for="contact-info" class="form-label">
-                    Contact Information *
-                  </label>
-                  <input
-                    type="text"
-                    id="contact-info"
-                    name="contact"
-                    required
-                    placeholder="Email, phone, or preferred contact method"
-                    class="form-input"
-                  />
-                  <p class="form-help">
-                    How should people reach you? This will be displayed publicly on your ad.
-                  </p>
-                </div>
-                
-                <!-- Category -->
-                <div class="form-section">
-                  <label for="category" class="form-label">
-                    Category
-                  </label>
-                  <select id="category" name="category" class="form-select">
-                    <option value="">Select a category (optional)</option>
-                    <option value="dating">Dating</option>
-                    <option value="friendship">Friendship</option>
-                    <option value="community">Community</option>
-                    <option value="activity">Activity Partner</option>
-                  </select>
-                </div>
-                
-                <!-- Location -->
-                <div class="form-section">
-                  <label for="location" class="form-label">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    id="location"
-                    name="location"
-                    placeholder="City, state, or 'Online'"
-                    class="form-input"
-                  />
-                </div>
-                
-                <!-- Optional Title -->
-                <div class="form-section">
-                  <label for="title" class="form-label">
-                    Optional Title
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    placeholder="A catchy title for your ad (optional)"
-                    class="form-input"
-                  />
-                  <p class="form-help">
-                    If left blank, we'll create one from the first few words of your personal.
-                  </p>
-                </div>
-                
-                <!-- Submit Button -->
-                <div class="form-submit">
-                  <button type="submit" class="submit-button">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                    </svg>
-                    Submit Personal
-                  </button>
-                </div>
-              </form>
-            </div>
-            
-            <!-- Guidelines -->
-            <div class="submit-guidelines">
-              <h2 class="guidelines-title">Submission Guidelines</h2>
-              <ul class="guidelines-list">
-                <li>Be respectful and kind in your language</li>
-                <li>Share authentic information about yourself</li>
-                <li>Don't include personal contact info in the ad text (use the contact field)</li>
-                <li>Focus on what you're looking for and what makes you unique</li>
-                <li>We review all submissions within 24-48 hours</li>
-              </ul>
+            <!-- Google Form Embed -->
+            <div class="form-embed-wrapper">
+              <iframe 
+                src="https://docs.google.com/forms/d/e/1FAIpQLScbgS0JX0MtfGMkc26ki24_u-OqUwBmcItwMFh5_-ma9SEOyA/viewform?embedded=true" 
+                width="100%" 
+                height="800" 
+                frameborder="0" 
+                marginheight="0" 
+                marginwidth="0"
+                class="google-form-embed"
+              >
+                Loading…
+              </iframe>
             </div>
           </div>
         </div>
@@ -161,85 +73,16 @@ import Footer from '../components/Footer.astro';
   margin-bottom: 2rem;
 }
 
-.submit-form-wrapper {
+.form-embed-wrapper {
   margin-bottom: 2.5rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
 }
 
-.form-section {
-  margin-bottom: 1.5rem;
-}
-
-.form-label {
-  display: block;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  margin-bottom: 0.5rem;
-}
-
-.form-input,
-.form-textarea,
-.form-select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.375rem;
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 1rem;
-  color: #1a1a1a;
-  background: #fff;
-  transition: border-color 0.15s;
-}
-
-.form-input:focus,
-.form-textarea:focus,
-.form-select:focus {
-  outline: none;
-  border-color: #aaf0d1;
-  box-shadow: 0 0 0 3px #aaf0d180;
-}
-
-.form-textarea {
-  resize: vertical;
-  min-height: 8rem;
-}
-
-.form-help {
-  font-family: 'Inter', system-ui, sans-serif;
-  font-size: 0.875rem;
-  color: #6b7280;
-  margin-top: 0.25rem;
-}
-
-.form-submit {
-  margin-top: 2rem;
-}
-
-.submit-button {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.875rem 1.75rem;
-  background: #aaf0d1;
-  color: #1a1a1a;
-  font-size: 1.125rem;
-  font-weight: 600;
-  border: 1.5px solid #aaf0d1;
-  border-radius: 0.375rem;
-  cursor: pointer;
-  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
-  transition: background 0.15s, color 0.15s, border 0.15s;
-}
-
-.submit-button:hover {
-  background: #7be0b2;
-  border-color: #7be0b2;
-  color: #1a1a1a;
-}
-
-.submit-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px #aaf0d180;
+.google-form-embed {
+  border: none;
+  border-radius: 0.5rem;
 }
 
 .submit-guidelines {
