@@ -11,185 +11,137 @@ import Footer from '../components/Footer.astro';
   <Header />
   
   <main class="min-h-screen bg-gray-50">
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white py-16">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-6">
-          About Our Community
-        </h1>
-        <p class="text-xl md:text-2xl mb-8">
-          Building meaningful connections in a safe, inclusive space for queer Jewish people.
-        </p>
-      </div>
-    </section>
-
-    <!-- Content Section -->
-    <section class="py-12">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- How It Works -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 class="text-3xl font-bold text-gray-900 mb-6">How It Works</h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">1. Submit Your Ad</h3>
-              <p class="text-gray-600">Fill out our Google Form with your personal ad. Share your story, interests, and what you're looking for.</p>
-            </div>
-            <div class="text-center">
-              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">2. Review & Publish</h3>
-              <p class="text-gray-600">Our team reviews submissions to ensure they meet our community guidelines before publishing.</p>
-            </div>
-            <div class="text-center">
-              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">3. Connect</h3>
-              <p class="text-gray-600">Browse personals and respond to those that interest you through the provided contact form.</p>
+    <section class="py-8">
+      <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- About Card -->
+        <div class="about-card">
+          <h1 class="about-title">About Queer Jewish Personals</h1>
+          
+          <div class="about-content">
+            <p class="about-text">
+              Welcome to Queer Jewish Personals, a community space for LGBTQ+ Jews to connect, build relationships, and find meaningful connections within our vibrant community.
+            </p>
+            
+            <h2 class="about-subtitle">Our Mission</h2>
+            <p class="about-text">
+              We believe that queer Jewish people deserve safe, welcoming spaces to find friendship, love, and community. This platform celebrates the intersection of queer and Jewish identities, providing a respectful environment for authentic connections.
+            </p>
+            
+            <h2 class="about-subtitle">Community Guidelines</h2>
+            <ul class="about-list">
+              <li>Be respectful and kind to all community members</li>
+              <li>Honor the diversity of Jewish practice and identity</li>
+              <li>Respect boundaries and consent in all interactions</li>
+              <li>Report any concerning behavior to help maintain a safe space</li>
+              <li>Celebrate the beautiful intersection of queer and Jewish life</li>
+            </ul>
+            
+            <h2 class="about-subtitle">Privacy & Safety</h2>
+            <p class="about-text">
+              Your privacy and safety are our top priorities. We encourage you to:
+            </p>
+            <ul class="about-list">
+              <li>Meet in public places for first-time encounters</li>
+              <li>Trust your instincts and take your time getting to know people</li>
+              <li>Use the contact information provided responsibly</li>
+              <li>Report any inappropriate behavior immediately</li>
+            </ul>
+            
+            <h2 class="about-subtitle">Get Involved</h2>
+            <p class="about-text">
+              Have a personal to share? We'd love to hear from you! Submit your personal through our submission form, and help grow this community space for queer Jewish connections.
+            </p>
+            
+            <div class="about-cta">
+              <a href="/submit" class="about-button">Submit a Personal</a>
             </div>
           </div>
-        </div>
-
-        <!-- Community Guidelines -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 class="text-3xl font-bold text-gray-900 mb-6">Community Guidelines</h2>
-          <div class="space-y-6">
-            <div class="border-l-4 border-indigo-500 pl-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Be Respectful & Inclusive</h3>
-              <p class="text-gray-600">Our community celebrates diversity. Be respectful of all identities, backgrounds, and experiences. No discrimination, harassment, or hate speech will be tolerated.</p>
-            </div>
-            <div class="border-l-4 border-green-500 pl-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Authentic Connections</h3>
-              <p class="text-gray-600">Be genuine in your personal ads. Share your true interests, values, and what you're looking for. Honest communication builds stronger connections.</p>
-            </div>
-            <div class="border-l-4 border-yellow-500 pl-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Privacy & Safety</h3>
-              <p class="text-gray-600">Don't share personal contact information in your ad. Use the provided contact form for initial communication. Meet in public places and trust your instincts.</p>
-            </div>
-            <div class="border-l-4 border-purple-500 pl-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Community Focus</h3>
-              <p class="text-gray-600">This is a community space, not just a dating site. We welcome ads for friendship, community building, activity partners, and romantic connections.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- What We're Looking For -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 class="text-3xl font-bold text-gray-900 mb-6">What We're Looking For</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-4">
-              <h3 class="text-lg font-semibold text-gray-900">✅ Great Personal Ads Include:</h3>
-              <ul class="space-y-2 text-gray-600">
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  Personal stories and experiences
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  Specific interests and hobbies
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  What you're seeking (friendship, dating, etc.)
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                  </svg>
-                  Values and what matters to you
-                </li>
-              </ul>
-            </div>
-            <div class="space-y-4">
-              <h3 class="text-lg font-semibold text-gray-900">❌ Please Avoid:</h3>
-              <ul class="space-y-2 text-gray-600">
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                  Generic or copy-pasted content
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                  Personal contact information
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                  Inappropriate or offensive content
-                </li>
-                <li class="flex items-start">
-                  <svg class="w-5 h-5 text-red-500 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                  </svg>
-                  Commercial or promotional content
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- FAQ -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
-          <h2 class="text-3xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
-          <div class="space-y-6">
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Who can submit a personal ad?</h3>
-              <p class="text-gray-600">Anyone who identifies as queer and Jewish can submit a personal ad. We welcome all gender identities, sexual orientations, and Jewish backgrounds.</p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">How long does it take for my ad to be published?</h3>
-              <p class="text-gray-600">We review submissions within 24-48 hours. Once approved, your ad will be published on the site.</p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Can I edit or remove my ad?</h3>
-              <p class="text-gray-600">Yes! Contact us through the form on the submit page and we'll help you update or remove your ad.</p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">Is this only for dating?</h3>
-              <p class="text-gray-600">No! While romantic connections are welcome, we also encourage ads for friendship, community building, activity partners, and other meaningful connections.</p>
-            </div>
-            <div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-2">How do I report inappropriate content?</h3>
-              <p class="text-gray-600">If you see content that violates our guidelines, please contact us immediately. We take all reports seriously and will address them promptly.</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Call to Action -->
-        <div class="text-center">
-          <a 
-            href="/submit" 
-            class="inline-flex items-center px-8 py-4 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200 text-lg"
-          >
-            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Submit Your Personal Ad
-          </a>
         </div>
       </div>
     </section>
   </main>
 
   <Footer />
-</Layout> 
+</Layout>
+
+<style>
+.about-card {
+  background: #fff;
+  border-left: 8px solid #aaf0d1;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+}
+
+.about-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.about-subtitle {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.about-text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #374151;
+  margin-bottom: 1rem;
+}
+
+.about-list {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #374151;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.about-list li {
+  margin-bottom: 0.5rem;
+}
+
+.about-cta {
+  margin-top: 2.5rem;
+  text-align: center;
+}
+
+.about-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: #aaf0d1;
+  color: #1a1a1a;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 0.375rem;
+  border: 1.5px solid #aaf0d1;
+  text-decoration: none;
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
+  transition: background 0.15s, color 0.15s, border 0.15s;
+}
+
+.about-button:hover {
+  background: #7be0b2;
+  border-color: #7be0b2;
+  color: #1a1a1a;
+}
+
+.about-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #aaf0d180;
+}
+</style> 
