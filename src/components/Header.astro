@@ -2,23 +2,79 @@
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="bg-white border-l-8 rounded-lg shadow-md px-8 py-4 flex items-center gap-4 mb-6" style="border-color: #2de2c5;">
-  <a href="/" class="flex items-center gap-3">
-    <span class="inline-flex items-center justify-center rounded-full w-8 h-8">
-      <svg viewBox="0 0 24 24" fill="#e4576e" width="24" height="24">
+<header class="header-card">
+  <a href="/" class="header-logo">
+    <span class="header-heart">
+      <svg viewBox="0 0 24 24" class="header-heart-svg">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
       </svg>
     </span>
-    <span class="font-serif text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight" style="font-family: 'Playfair Display', serif;">
+    <span class="header-title">
       Queer Jewish Personals
     </span>
   </a>
-  <nav class="ml-auto flex items-center gap-6">
-    <a href="/" class="text-base font-medium text-gray-700 hover:text-[#2de2c5] transition-colors">Browse</a>
-    <a href="/about" class="text-base font-medium text-gray-700 hover:text-[#2de2c5] transition-colors">About</a>
-    <a href="/submit" class="text-base font-medium text-gray-700 hover:text-[#2de2c5] transition-colors">Submit</a>
+  <nav class="header-nav">
+    <a href="/" class="header-link">Browse</a>
+    <a href="/about" class="header-link">About</a>
+    <a href="/submit" class="header-link">Submit</a>
   </nav>
 </header>
+
+<style>
+.header-card {
+  background: #fff;
+  border-left: 8px solid #aaf0d1;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+.header-heart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  width: 2rem;
+  height: 2rem;
+}
+.header-heart-svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  fill: #e4576e;
+}
+.header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
+}
+.header-nav {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.header-link {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #444;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.header-link:hover {
+  color: #aaf0d1;
+}
+</style>
 
 <script>
   // Mobile menu toggle
