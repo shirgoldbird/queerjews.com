@@ -1,0 +1,82 @@
+[
+  {
+    "id": "001",
+    "personal": "Shalom! I'm a 28-year-old queer Jewish woman looking for meaningful connections in the NYC area. I love cooking traditional Jewish dishes, hiking, and discussing philosophy over coffee. Seeking friendship and potentially more with someone who values community and intellectual curiosity. I'm involved in local Jewish social justice work and would love to connect with someone who shares similar values.",
+    "contact": "https://forms.gle/example1",
+    "date_posted": "2025-01-15",
+    "category": "dating",
+    "location": "nyc"
+  },
+  {
+    "id": "002",
+    "personal": "Hi there! I'm a 32-year-old non-binary person looking for queer Jewish friends in the LA area. I'm passionate about art, music, and building inclusive communities. I work as a teacher and love exploring new restaurants, going to concerts, and having deep conversations about identity and culture. Looking for platonic friendships with people who understand the intersection of queerness and Jewishness.",
+    "contact": "https://forms.gle/example2",
+    "date_posted": "2025-01-14",
+    "category": "friendship",
+    "location": "la"
+  },
+  {
+    "id": "003",
+    "personal": "Shavua tov! I'm a 25-year-old gay Jewish man seeking a romantic partner. I'm a software engineer who loves playing guitar, reading sci-fi novels, and trying new recipes. I'm looking for someone who is kind, curious, and values family and tradition. I'm based in Chicago but open to long-distance connections. Let's build something beautiful together!",
+    "contact": "https://forms.gle/example3",
+    "date_posted": "2025-01-13",
+    "category": "dating",
+    "location": "chicago"
+  },
+  {
+    "id": "004",
+    "personal": "Hello! I'm a 35-year-old queer Jewish person looking for community connections. I'm organizing a monthly queer Jewish book club and would love to find more participants! We read everything from contemporary Jewish literature to queer theory. All are welcome regardless of background or experience. Let's build community together through meaningful discussions and shared learning.",
+    "contact": "https://forms.gle/example4",
+    "date_posted": "2025-01-12",
+    "category": "community",
+    "location": "online"
+  },
+  {
+    "id": "005",
+    "personal": "Hi! I'm a 29-year-old lesbian Jewish woman looking for a hiking buddy in the Bay Area. I love exploring nature trails, photography, and having deep conversations about life, spirituality, and social justice. I'm seeking friendship with someone who enjoys outdoor adventures and meaningful connections. Bonus points if you also love dogs and good coffee!",
+    "contact": "https://forms.gle/example5",
+    "date_posted": "2025-01-11",
+    "category": "activity",
+    "location": "online"
+  },
+  {
+    "id": "006",
+    "personal": "Shalom! I'm a 31-year-old bisexual Jewish man looking for romantic connections. I'm a therapist who loves cooking, playing board games, and exploring new cities. I value authenticity, emotional intelligence, and shared values around family and community. I'm based in Boston but travel frequently. Looking for someone who wants to build a life together filled with love, laughter, and growth.",
+    "contact": "https://forms.gle/example6",
+    "date_posted": "2025-01-10",
+    "category": "dating",
+    "location": "online"
+  },
+  {
+    "id": "007",
+    "personal": "Hi everyone! I'm a 27-year-old queer Jewish person looking for friends in the Portland area. I'm a graphic designer who loves creating art, going to farmers markets, and learning about different cultures. I'm passionate about sustainability and social justice. Looking for friends who want to explore the city together, share meals, and build meaningful connections.",
+    "contact": "https://forms.gle/example7",
+    "date_posted": "2025-01-09",
+    "category": "friendship",
+    "location": "online"
+  },
+  {
+    "id": "008",
+    "personal": "Shavua tov! I'm a 33-year-old gay Jewish man seeking a serious relationship. I work in healthcare and am passionate about helping others. I love traveling, trying new cuisines, and spending time with family. I'm looking for someone who is kind, compassionate, and values building a life together. I'm based in Miami but open to connections anywhere.",
+    "contact": "https://forms.gle/example8",
+    "date_posted": "2025-01-08",
+    "category": "dating",
+    "location": "online"
+  },
+  {
+    "id": "009",
+    "personal": "Hello! I'm a 26-year-old queer Jewish woman looking for community in the Seattle area. I'm a social worker who loves reading, yoga, and exploring the Pacific Northwest. I'm involved in local queer Jewish organizations and would love to connect with others who are building community here. Looking for friends and potential romantic connections.",
+    "contact": "https://forms.gle/example9",
+    "date_posted": "2025-01-07",
+    "category": "community",
+    "location": "online"
+  },
+  {
+    "id": "010",
+    "personal": "Hi! I'm a 30-year-old non-binary Jewish person looking for a workout buddy in the Austin area. I love strength training, rock climbing, and trying new fitness classes. I'm also passionate about cooking and would love to find someone to meal prep with! Looking for friendship with someone who shares similar fitness goals and values.",
+    "contact": "https://forms.gle/example10",
+    "date_posted": "2025-01-06",
+    "category": "activity",
+    "location": "online"
+  }
+] 

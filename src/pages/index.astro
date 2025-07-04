@@ -1,16 +1,123 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import SearchFilter from '../components/SearchFilter.astro';
+import PersonalCard from '../components/PersonalCard.astro';
 
+// Sample data - in production this would come from JSON files
+const personals = [
+  {
+    id: "001",
+    personal: "Shalom! I'm a 28-year-old queer Jewish woman looking for meaningful connections in the NYC area. I love cooking traditional Jewish dishes, hiking, and discussing philosophy over coffee. Seeking friendship and potentially more with someone who values community and intellectual curiosity. I'm involved in local Jewish social justice work and would love to connect with someone who shares similar values.",
+    contact: "https://forms.gle/example1",
+    date_posted: "2025-01-15",
+    category: "dating",
+    location: "nyc"
+  },
+  {
+    id: "002",
+    personal: "Hi there! I'm a 32-year-old non-binary person looking for queer Jewish friends in the LA area. I'm passionate about art, music, and building inclusive communities. I work as a teacher and love exploring new restaurants, going to concerts, and having deep conversations about identity and culture. Looking for platonic friendships with people who understand the intersection of queerness and Jewishness.",
+    contact: "https://forms.gle/example2",
+    date_posted: "2025-01-14",
+    category: "friendship",
+    location: "la"
+  },
+  {
+    id: "003",
+    personal: "Shavua tov! I'm a 25-year-old gay Jewish man seeking a romantic partner. I'm a software engineer who loves playing guitar, reading sci-fi novels, and trying new recipes. I'm looking for someone who is kind, curious, and values family and tradition. I'm based in Chicago but open to long-distance connections. Let's build something beautiful together!",
+    contact: "https://forms.gle/example3",
+    date_posted: "2025-01-13",
+    category: "dating",
+    location: "chicago"
+  },
+  {
+    id: "004",
+    personal: "Hello! I'm a 35-year-old queer Jewish person looking for community connections. I'm organizing a monthly queer Jewish book club and would love to find more participants! We read everything from contemporary Jewish literature to queer theory. All are welcome regardless of background or experience. Let's build community together through meaningful discussions and shared learning.",
+    contact: "https://forms.gle/example4",
+    date_posted: "2025-01-12",
+    category: "community",
+    location: "online"
+  },
+  {
+    id: "005",
+    personal: "Hi! I'm a 29-year-old lesbian Jewish woman looking for a hiking buddy in the Bay Area. I love exploring nature trails, photography, and having deep conversations about life, spirituality, and social justice. I'm seeking friendship with someone who enjoys outdoor adventures and meaningful connections. Bonus points if you also love dogs and good coffee!",
+    contact: "https://forms.gle/example5",
+    date_posted: "2025-01-11",
+    category: "activity",
+    location: "online"
+  },
+  {
+    id: "006",
+    personal: "Shalom! I'm a 31-year-old bisexual Jewish man looking for romantic connections. I'm a therapist who loves cooking, playing board games, and exploring new cities. I value authenticity, emotional intelligence, and shared values around family and community. I'm based in Boston but travel frequently. Looking for someone who wants to build a life together filled with love, laughter, and growth.",
+    contact: "https://forms.gle/example6",
+    date_posted: "2025-01-10",
+    category: "dating",
+    location: "online"
+  }
+];
+
+// Sort by date (newest first)
+personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_posted).getTime());
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Queer Jewish Personals - Find Meaningful Connections">
+  <Header />
+  
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          Find Your Community
+        </h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+          Connect with queer Jewish people through meaningful personal ads. Build friendships, find love, and strengthen our community.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <a 
+            href="/submit" 
+            class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200"
+          >
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Submit Your Ad
+          </a>
+          <a 
+            href="/about" 
+            class="inline-flex items-center px-6 py-3 border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-indigo-600 transition-colors duration-200"
+          >
+            Learn More
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="py-12">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Search and Filter -->
+        <SearchFilter />
+
+        <!-- Personals Grid -->
+        <div id="personals-container" class="grid grid-cols-1 md:grid-cols-2 gap-12">
+          {personals.map((personal) => (
+            <PersonalCard {...personal} />
+          ))}
+        </div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="hidden text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No personals found</h3>
+          <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filters.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>

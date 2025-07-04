@@ -1,0 +1,73 @@
+---
+export interface Props {
+  id: string;
+  personal: string;
+  contact: string;
+  date_posted: string;
+  category?: string;
+  location?: string;
+}
+
+const { id, personal, contact, date_posted, category, location } = Astro.props;
+
+// Format date
+const formattedDate = new Date(date_posted).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+
+// Generate a "headline" from the first 6-8 words
+const words = personal.split(' ');
+const headline = words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
+const rest = words.slice(8).join(' ');
+
+// Byline: location • date
+const byline = [location ? location.toUpperCase() : null, formattedDate].filter(Boolean).join(' • ');
+---
+
+<article class="relative bg-[#fcfaf7] border-2 border-gray-800 rounded-lg p-7 mb-10 max-w-2xl mx-auto transition-none" style="font-family: 'Inter', 'Playfair Display', serif;">
+  <!-- Byline -->
+  <div class="flex items-center justify-between mb-2">
+    <span class="text-xs text-gray-700 tracking-wide uppercase font-mono">{byline}</span>
+    <span class="text-xs text-gray-400">#{id}</span>
+  </div>
+  <!-- Headline -->
+  <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif;">
+    {headline}
+  </h2>
+  <!-- Body -->
+  <p class="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-sans mb-5" style="font-family: 'Inter', system-ui, sans-serif;">
+    {rest}
+  </p>
+  <!-- Tags -->
+  <div class="flex flex-wrap gap-2 mb-5">
+    {category && <span class="inline-block border border-gray-400 bg-white text-gray-700 px-2 py-0.5 rounded text-xs font-mono uppercase tracking-wide">{category}</span>}
+  </div>
+  <!-- Action Button -->
+  <div class="flex justify-end">
+    <a 
+      href={contact}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded border border-gray-800 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 transition-colors duration-200"
+    >
+      <svg class="w-4 h-4 mr-2 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+      Respond
+    </a>
+  </div>
+</article>
+
+<style is:global>
+  .font-serif {
+    font-family: 'Playfair Display', serif;
+  }
+  .font-sans {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  .font-mono {
+    font-family: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  }
+</style> 

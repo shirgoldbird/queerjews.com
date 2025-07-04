@@ -1,0 +1,193 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout 
+  title="Submit Your Ad - Queer Jewish Personals" 
+  description="Submit your personal ad to connect with the queer Jewish community. Share your story and find meaningful connections."
+>
+  <Header />
+  
+  <main class="min-h-screen bg-gray-50">
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white py-16">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+          Submit Your Personal Ad
+        </h1>
+        <p class="text-xl md:text-2xl mb-8">
+          Share your story and connect with the queer Jewish community.
+        </p>
+      </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="py-12">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Submission Form -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Submit Your Ad</h2>
+          
+          <!-- Google Form Embed -->
+          <div class="mb-8">
+            <div class="bg-gray-100 rounded-lg p-8 text-center">
+              <div class="mb-4">
+                <svg class="w-12 h-12 text-gray-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Google Form Coming Soon</h3>
+              <p class="text-gray-600 mb-4">
+                Our submission form is being set up. For now, you can use the contact form below to submit your personal ad.
+              </p>
+              <a 
+                href="#contact-form" 
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+              >
+                Use Contact Form
+              </a>
+            </div>
+          </div>
+
+          <!-- Alternative Contact Form -->
+          <div id="contact-form" class="border-t border-gray-200 pt-8">
+            <h3 class="text-xl font-semibold text-gray-900 mb-4">Submit via Email</h3>
+            <p class="text-gray-600 mb-6">
+              Send us your personal ad via email and we'll review and publish it for you.
+            </p>
+            
+            <div class="bg-indigo-50 rounded-lg p-6 mb-6">
+              <h4 class="font-semibold text-indigo-900 mb-2">What to Include:</h4>
+              <ul class="text-indigo-800 space-y-1 text-sm">
+                <li>• Your personal story and what you're looking for</li>
+                <li>• Your interests, hobbies, and values</li>
+                <li>• Your location (city/region or "online")</li>
+                <li>• The type of connection you're seeking (dating, friendship, community, etc.)</li>
+                <li>• Any specific preferences or requirements</li>
+              </ul>
+            </div>
+
+            <div class="text-center">
+              <a 
+                href="mailto:submit@queerjewishpersonals.com?subject=Personal Ad Submission" 
+                class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+              >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Submit via Email
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tips for Great Personal Ads -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Tips for Writing a Great Personal Ad</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900">Tell Your Story</h3>
+              <p class="text-gray-600">
+                Share what makes you unique. Talk about your experiences, passions, and what brings you joy. 
+                People connect with authentic stories more than lists of facts.
+              </p>
+              
+              <h3 class="text-lg font-semibold text-gray-900">Be Specific</h3>
+              <p class="text-gray-600">
+                Instead of saying "I like music," mention specific artists or genres. 
+                Instead of "I enjoy cooking," share what you love to make or your favorite cuisine.
+              </p>
+              
+              <h3 class="text-lg font-semibold text-gray-900">Share Your Values</h3>
+              <p class="text-gray-600">
+                What matters to you? Social justice, family, spirituality, creativity? 
+                Sharing your values helps others understand what kind of connection you're seeking.
+              </p>
+            </div>
+            
+            <div class="space-y-4">
+              <h3 class="text-lg font-semibold text-gray-900">Be Clear About What You Want</h3>
+              <p class="text-gray-600">
+                Are you looking for friendship, dating, community building, or something else? 
+                Being clear helps people know if they should reach out.
+              </p>
+              
+              <h3 class="text-lg font-semibold text-gray-900">Include Conversation Starters</h3>
+              <p class="text-gray-600">
+                Mention something that could spark a conversation - a book you're reading, 
+                a place you want to visit, or a question you've been pondering.
+              </p>
+              
+              <h3 class="text-lg font-semibold text-gray-900">Keep It Positive</h3>
+              <p class="text-gray-600">
+                Focus on what you're excited about and what you're looking for, 
+                rather than what you're trying to avoid.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Example Personal Ad -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">Example Personal Ad</h2>
+          <div class="bg-gray-50 rounded-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-sm text-gray-500 font-medium">January 15, 2025</span>
+              <span class="text-xs text-gray-400">#EXAMPLE</span>
+            </div>
+            <p class="text-gray-800 leading-relaxed mb-4">
+              Shalom! I'm a 28-year-old queer Jewish woman who recently moved to NYC and is looking to build community. 
+              I work as a social worker and spend my free time experimenting with traditional Jewish recipes 
+              (my challah is getting better each week!), hiking in the Hudson Valley, and reading contemporary Jewish literature.
+            </p>
+            <p class="text-gray-800 leading-relaxed mb-4">
+              I'm passionate about social justice and am involved in local organizing around housing rights. 
+              I'm looking for friends who share similar values and want to explore the city together - 
+              whether that's trying new restaurants, attending cultural events, or having deep conversations over coffee.
+            </p>
+            <p class="text-gray-800 leading-relaxed">
+              I'd love to connect with other queer Jewish people who are also building their chosen families and communities. 
+              Bonus points if you also love board games or want to start a book club!
+            </p>
+            <div class="mt-4 text-sm text-gray-600">
+              <span class="inline-block bg-indigo-100 text-indigo-800 px-2 py-1 rounded mr-2">Friendship</span>
+              <span class="inline-block bg-green-100 text-green-800 px-2 py-1 rounded">NYC</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- What Happens Next -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-6">What Happens After You Submit</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="text-center">
+              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl font-bold text-indigo-600">1</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Review</h3>
+              <p class="text-gray-600">We'll review your submission within 24-48 hours to ensure it meets our community guidelines.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl font-bold text-indigo-600">2</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Publish</h3>
+              <p class="text-gray-600">Once approved, your ad will be published on the site where others can discover and respond to it.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-2xl font-bold text-indigo-600">3</span>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 mb-2">Connect</h3>
+              <p class="text-gray-600">People can respond to your ad through the contact form, and you can start building meaningful connections.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout> 
