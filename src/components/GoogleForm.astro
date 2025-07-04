@@ -2,13 +2,13 @@
 export interface Props {
   formId: string;
   height?: string;
-  className?: string;
+  title?: string;
 }
 
-const { formId, height = "800", className = "" } = Astro.props;
+const { formId, height = "800", title = "Google Form" } = Astro.props;
 ---
 
-<div class={`form-embed-wrapper ${className}`}>
+<div class="form-embed-wrapper">
   <iframe 
     src={`https://docs.google.com/forms/d/e/${formId}/viewform?embedded=true`}
     width="100%" 
@@ -17,6 +17,7 @@ const { formId, height = "800", className = "" } = Astro.props;
     marginheight="0" 
     marginwidth="0"
     class="google-form-embed"
+    title={title}
   >
     Loading…
   </iframe>
