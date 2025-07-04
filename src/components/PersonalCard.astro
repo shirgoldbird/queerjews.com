@@ -40,22 +40,21 @@ const byline = [location ? location.toUpperCase() : null, formattedDate].filter(
     {headline}
   </h2>
   <!-- Body -->
-  <p class="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-sans mb-5" style="font-family: 'Inter', system-ui, sans-serif;">
+  <p class="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-sans" style="font-family: 'Inter', system-ui, sans-serif;">
     {personal}
   </p>
-  <!-- Tags -->
-  <div class="flex flex-wrap gap-2 mb-5">
-    {category && <span class="personal-tag">{category}</span>}
-  </div>
-  <!-- Action Button -->
-  <div class="flex justify-end">
+  <!-- Tags and Respond Button Row -->
+  <div class="personal-bottom-row">
+    <div class="flex flex-wrap gap-2">
+      {category && <span class="personal-tag">{category}</span>}
+    </div>
     <a 
       href={contact}
       target="_blank"
       rel="noopener noreferrer"
       class="personal-respond"
     >
-      <svg class="w-4 h-4 mr-2" fill="none" stroke="#5ec9a5" stroke-width="2" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="#1a1a1a" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
       </svg>
       Respond
@@ -75,6 +74,9 @@ const byline = [location ? location.toUpperCase() : null, formattedDate].filter(
   margin-left: auto;
   margin-right: auto;
   font-family: 'Inter', 'Playfair Display', serif;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .personal-tag {
   display: inline-block;
@@ -116,5 +118,12 @@ const byline = [location ? location.toUpperCase() : null, formattedDate].filter(
 .personal-respond:focus {
   outline: none;
   box-shadow: 0 0 0 3px #aaf0d180;
+}
+.personal-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  gap: 1rem;
 }
 </style> 
