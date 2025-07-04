@@ -29,7 +29,14 @@ if (!headline) {
 const byline = [location ? location.toUpperCase() : null, formattedDate].filter(Boolean).join(' • ');
 ---
 
-<article class="personal-card">
+<article 
+  class="personal-card"
+  data-personal-id={id}
+  data-personal-text={`${headline} ${personal}`}
+  data-personal-date={date_posted}
+  data-personal-category={category || ''}
+  data-personal-location={location || ''}
+>
   <!-- Byline -->
   <div class="flex items-center justify-between mb-2">
     <span class="text-xs text-gray-700 tracking-wide uppercase font-mono">{byline}</span>
