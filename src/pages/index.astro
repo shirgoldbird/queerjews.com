@@ -13,7 +13,7 @@ personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_pos
 <Layout title="Queer Jews | Find Your People!">
   <Header />
   
-  <main class="min-h-screen bg-gray-50">
+  <main class="bg-gray-50">
     <!-- Content Section -->
     <section class="py-4">
       <div class="w-full xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,7 +21,7 @@ personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_pos
         <SearchFilter />
 
         <!-- Personals Grid -->
-        <div id="personals-container" class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div id="personals-container" class="grid grid-cols-1 md:grid-cols-2 gap-12 justify-items-start">
           {personals.map((personal) => (
             <PersonalCard {...personal} />
           ))}
