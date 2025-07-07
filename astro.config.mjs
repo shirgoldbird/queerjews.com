@@ -7,5 +7,5 @@ import preact from '@astrojs/preact';
 // https://astro.build/config
 export default defineConfig({
   integrations: [tailwind(), mdx(), preact()],
-  site: 'https://yourusername.github.io'
+  site: "https://queerjews.com",
 });
