@@ -13,23 +13,37 @@ const { title, description, image } = Astro.props;
 ---
 
 <Layout title={title} description={description} image={image}>
-  <Header />
-  
-  <main class="min-h-screen bg-gray-50">
-    <section class="py-8">
-      <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Content Card -->
-        <div class="content-card">
-          <slot />
+  <div class="page-container">
+    <Header />
+    
+    <main class="main-content">
+      <section class="py-8">
+        <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <!-- Content Card -->
+          <div class="content-card">
+            <slot />
+          </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
 
-  <Footer />
+    <Footer />
+  </div>
 </Layout>
 
 <style>
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f9fafb;
+}
+
+.main-content {
+  flex: 1;
+  background: #f9fafb;
+}
+
 .content-card {
   background: #fff;
   border-left: 8px solid #aaf0d1;
