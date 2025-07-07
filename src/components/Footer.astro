@@ -3,53 +3,46 @@ const currentYear = new Date().getFullYear();
 ---
 
 <footer class="footer-wrapper">
-  <div class="footer-card">
-    <div class="footer-content">
-      <!-- Brand Section -->
-      <div class="footer-brand">
-        <div class="footer-logo">
-          <span class="footer-heart">
-            <svg viewBox="0 0 24 24" class="footer-heart-svg">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
-          </span>
-          <span class="footer-title">Queer Jews</span>
+  <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="footer-card">
+      <div class="footer-content">
+        <!-- Brand Section -->
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <span class="footer-heart">
+              <svg viewBox="0 0 24 24" class="footer-heart-svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </span>
+            <span class="footer-title">Queer Jews</span>
+          </div>
+          <p class="footer-description">
+            A community space for queer Jewish people to connect, build relationships, and find meaningful connections.
+          </p>
         </div>
-        <p class="footer-description">
-          A community space for queer Jewish people to connect, build relationships, and find meaningful connections.
+
+        <!-- Links Section -->
+        <div class="footer-links right-align">
+          <div class="footer-section">
+            <h3 class="footer-heading">Quick Links</h3>
+            <ul class="footer-list">
+              <li><a href="/" class="footer-link">Browse Personals</a></li>
+              <li><a href="/about" class="footer-link">About</a></li>
+              <li><a href="/submit" class="footer-link">Submit</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <p class="footer-copyright">
+          © {currentYear} Queer Jews. Built with love for the community.
         </p>
-      </div>
-
-      <!-- Links Section -->
-      <div class="footer-links">
-        <div class="footer-section">
-          <h3 class="footer-heading">Quick Links</h3>
-          <ul class="footer-list">
-            <li><a href="/" class="footer-link">Browse Personals</a></li>
-            <li><a href="/about" class="footer-link">About</a></li>
-            <li><a href="/submit" class="footer-link">Submit</a></li>
-          </ul>
+        <div class="footer-legal">
+          <a href="/privacy" class="footer-legal-link">Privacy</a>
+          <a href="/terms" class="footer-legal-link">Terms</a>
         </div>
-
-        <div class="footer-section">
-          <h3 class="footer-heading">Community</h3>
-          <ul class="footer-list">
-            <li><a href="mailto:shadchan@queerjews.com" class="footer-link">Contact Us</a></li>
-            <li><a href="/about" class="footer-link">Guidelines</a></li>
-            <li><a href="#" class="footer-link">Safety</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer Bottom -->
-    <div class="footer-bottom">
-      <p class="footer-copyright">
-        © {currentYear} Queer Jews. Built with love for the community.
-      </p>
-      <div class="footer-legal">
-        <a href="#" class="footer-legal-link">Privacy</a>
-        <a href="#" class="footer-legal-link">Terms</a>
       </div>
     </div>
   </div>
@@ -61,13 +54,11 @@ const currentYear = new Date().getFullYear();
 }
 
 .footer-card {
-  max-width: 72rem;
-  margin: 0 auto;
   background: #fff;
   border-left: 8px solid #aaf0d1;
   border-radius: 0.5rem;
   box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
-  padding: 2rem;
+  padding: 1rem 2.5rem 2.5rem 2.5rem;
 }
 
 .footer-content {
@@ -118,10 +109,11 @@ const currentYear = new Date().getFullYear();
   color: #6b7280;
 }
 
-.footer-links {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
+.footer-links.right-align {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
 .footer-section {
@@ -163,10 +155,11 @@ const currentYear = new Date().getFullYear();
   border-top: 1px solid #e5e7eb;
   padding-top: 1.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  flex-direction: row;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
+  gap: 1rem;
+  text-align: left;
 }
 
 .footer-copyright {
@@ -179,6 +172,7 @@ const currentYear = new Date().getFullYear();
 .footer-legal {
   display: flex;
   gap: 1.5rem;
+  margin-left: auto;
 }
 
 .footer-legal-link {
@@ -200,18 +194,20 @@ const currentYear = new Date().getFullYear();
     gap: 2rem;
   }
   
-  .footer-links {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
+  .footer-links.right-align {
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 1.5rem;
   }
   
   .footer-bottom {
     flex-direction: column;
-    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
   }
   
   .footer-legal {
-    gap: 1rem;
+    margin-left: 0;
   }
 }
 </style> 
