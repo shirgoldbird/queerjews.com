@@ -1,0 +1,22 @@
+{
+  "name": "Queer Jews",
+  "short_name": "Queer Jews",
+  "description": "A low-fi, text-only space for queer Jews to find their people.",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#aaf0d1",
+  "background_color": "#f9fafb",
+  "display": "standalone",
+  "start_url": "/",
+  "scope": "/"
+}
