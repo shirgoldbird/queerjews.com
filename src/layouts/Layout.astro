@@ -5,7 +5,7 @@ export interface Props {
   image?: string;
 }
 
-const { title, description = "A community space for queer Jewish people to connect through personal ads", image = "/og-image.jpg" } = Astro.props;
+const { title, description = "A community space for queer Jewish people to connect, build relationships, and find meaningful connections.", image = "/og-image.jpg" } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 

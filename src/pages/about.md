@@ -1,36 +1,13 @@
 ---
 layout: ../layouts/PageLayout.astro
-title: About - Queer Jewish Personals
+title: About
 ---
 
-# About Queer Jewish Personals
+# About
 
-Welcome to Queer Jewish Personals, a community space for LGBTQ+ Jews to connect, build relationships, and find meaningful connections within our vibrant community.
+Welcome to Queer Jews—we're here to help you find your person (or people!). 
 
-## Our Mission
-
-We believe that queer Jewish people deserve safe, welcoming spaces to find friendship, love, and community. This platform celebrates the intersection of queer and Jewish identities, providing a respectful environment for authentic connections.
-
-## Community Guidelines
-
-- Be respectful and kind to all community members
-- Honor the diversity of Jewish practice and identity
-- Respect boundaries and consent in all interactions
-- Report any concerning behavior to help maintain a safe space
-- Celebrate the beautiful intersection of queer and Jewish life
-
-## Privacy & Safety
-
-Your privacy and safety are our top priorities. We encourage you to:
-
-- Meet in public places for first-time encounters
-- Trust your instincts and take your time getting to know people
-- Use the contact information provided responsibly
-- Report any inappropriate behavior immediately
-
-## Get Involved
-
-Have a personal to share? We'd love to hear from you! Submit your personal through our submission form, and help grow this community space for queer Jewish connections.
+Inspired by old-school personal ad culture and its modern descendants like Lex or Hey Alma Classifieds, Queer Jews provides a low-fi, text-only space for queer Jews to connect.
 
 <div class="about-cta">
   <a href="/submit" class="about-button">Submit a Personal</a>

@@ -1,4 +1,4 @@
-# Queer Jewish Personals
+# Queer Jews
 
 A community-oriented personals website for queer Jewish people to connect, build relationships, and find meaningful connections. Built with Astro and designed with accessibility and inclusivity in mind.
 
