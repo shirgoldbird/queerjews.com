@@ -2,8 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import SearchFilter from '../components/SearchFilter.astro';
-import PersonalCard from '../components/PersonalCard.astro';
+import PersonalsGrid from '../components/PersonalsGrid.jsx';
 import personals from '../data/personals.json';
 
 // Sort by date (newest first)
@@ -18,14 +17,7 @@ personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_pos
     <section class="py-4">
       <div class="w-full xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Search and Filter -->
-        <SearchFilter />
-
-        <!-- Personals Grid -->
-        <div id="personals-container" class="grid grid-cols-1 md:grid-cols-2 gap-12 justify-items-start">
-          {personals.map((personal) => (
-            <PersonalCard {...personal} />
-          ))}
-        </div>
+        <PersonalsGrid personals={personals} client:visible />
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden text-center py-12">
@@ -41,46 +33,3 @@ personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_pos
 
   <Footer />
 </Layout>
-
-<style>
-.featured-card-header-wrapper {
-  width: 100%;
-  max-width: 72rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
-}
-.featured-card-header {
-  background: #fff;
-  border-left: 8px solid #aaf0d1;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
-  padding: 1.75rem 2rem;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.featured-heart {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  width: 2.5rem;
-  height: 2.5rem;
-}
-.featured-heart-svg {
-  width: 1.75rem;
-  height: 1.75rem;
-  fill: #e4576e;
-}
-.featured-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.25rem;
-  font-weight: bold;
-  color: #1a1a1a;
-  letter-spacing: -0.01em;
-}
-</style>
