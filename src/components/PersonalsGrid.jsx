@@ -2,7 +2,9 @@ import { h } from 'preact';
 import { useState } from 'preact/hooks';
 
 function formatDate(dateStr) {
-  const date = new Date(dateStr);
+  // Parse date as local date to avoid timezone issues
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day); // month is 0-indexed
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
