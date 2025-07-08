@@ -20,11 +20,17 @@ export default function PersonalsGrid({ personals }) {
 
   // Get unique locations from the data
   const uniqueLocations = [...new Set(personals.map(p => p.location).filter(Boolean))].sort();
+  
+  // Get unique categories from the data
+  const allCategories = personals.flatMap(p => 
+    Array.isArray(p.categories) ? p.categories : (p.category ? [p.category] : [])
+  );
+  const uniqueCategories = [...new Set(allCategories)].sort();
 
   let filtered = personals.filter((p) => {
     const text = `${p.title || ''} ${p.personal || ''}`.toLowerCase();
     const matchesSearch = !search || text.includes(search.toLowerCase());
-    const matchesCategory = !category || (p.category === category || (Array.isArray(p.categories) && p.categories.map(c => c.toLowerCase()).includes(category)));
+    const matchesCategory = !category || (p.category === category || (Array.isArray(p.categories) && p.categories.includes(category)));
     const matchesLocation = !location || (p.location && p.location === location);
     return matchesSearch && matchesCategory && matchesLocation;
   });
@@ -71,9 +77,9 @@ export default function PersonalsGrid({ personals }) {
               class="block w-full border-0 border-b-2 border-gray-300 bg-transparent px-0 py-1 text-base text-gray-900 focus:border-gray-800 focus:ring-0 font-sans"
             >
               <option value="">All</option>
-              <option value="dating">Dating</option>
-              <option value="friendship">Friendship</option>
-              <option value="community">Community</option>
+              {uniqueCategories.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
           <div>
