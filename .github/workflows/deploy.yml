@@ -1,9 +1,10 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger the workflow every time you push to the `main` branch
-  push:
-    branches: [ main ]
+  # Do NOT trigger the workflow every time you push to the `main` branch
+  # This is because we're using a workflow_run trigger to trigger this workflow when the content sync workflow completes
+  # push:
+  #   branches: [ main ]
   workflow_run:
     workflows: ["Content Sync from Google Sheets"]
     types:
