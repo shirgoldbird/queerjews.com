@@ -1,1 +1,25 @@
-[]
+[
+  {
+    "id": "1",
+    "title": "Shadchan seeking setups",
+    "personal": "I'm an amateur shadchan who wants to become a pro. Are you in search of love? Share the details with queerjews.com and let us help you!",
+    "contact": "https://docs.google.com/forms/d/e/1FAIpQLSc1D2FDfWoTdgJK_1gbnh0aubLakTFORk6U3Kvq86XxNiaN1A/viewform",
+    "date_posted": "2025-07-07",
+    "categories": [
+      "Friendship",
+      "Community"
+    ],
+    "location": "New York City"
+  },
+  {
+    "id": "2",
+    "title": "I LOVE SHABBOS, YOU TOO?",
+    "personal": "31 y/o femme looking to ✨ fall in love ✨ with a shomer shabbos queer. Let's lie in the grass, go dancing, make dinner, stay up late talking and laughing and..I'm an artist, teacher, romantic, communal living in NYC, tryna make the revolution irresistible. Hoping for squishy babies in the future.",
+    "contact": "https://docs.google.com/forms/d/e/1FAIpQLSdamfdhNhZOFYR5wjThDP_kjlJCrtpN7kJE0mdoA83gIiYfUw/viewform",
+    "date_posted": "2025-07-07",
+    "categories": [
+      "Dating"
+    ],
+    "location": "New York City"
+  }
+]
