@@ -15,6 +15,7 @@ pnpm-debug.log*
 
 # environment variables
 .env
+.env.local
 .env.production
 
 # macOS-specific files
@@ -22,3 +23,13 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Google API credentials (for local development)
+google-credentials.json
+google_credentials.json
+
+# Test output files
+src/data/personals-test.json
+
+# Generated content (will be managed by GitHub Actions)
+# src/data/personals.json
