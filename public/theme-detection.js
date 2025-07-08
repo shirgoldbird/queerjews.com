@@ -15,8 +15,41 @@
       console.warn('localStorage not available, falling back to system preference');
     }
     
-    // Fall back to system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Check if system preference is supported and what it prefers
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const systemPrefersDark = mediaQuery.matches;
+    
+    // If the media query is supported, use system preference; otherwise default to light mode
+    if (mediaQuery.media !== 'not all') {
+      return systemPrefersDark ? 'dark' : 'light';
+    } else {
+      // System preference not supported, default to light mode
+      return 'light';
+    }
+  }
+  
+  // Function to get the current theme with logging (for initial load)
+  function getThemeWithLogging() {
+    // Log the theme detection process
+    try {
+      const savedTheme = localStorage.getItem('theme');
+      console.log('Saved theme from localStorage:', savedTheme);
+      if (savedTheme === 'dark' || savedTheme === 'light') {
+        console.log('Using saved theme:', savedTheme);
+        return savedTheme;
+      }
+    } catch (e) {
+      console.warn('localStorage not available, falling back to system preference');
+    }
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const systemPrefersDark = mediaQuery.matches;
+    console.log('System prefers dark mode:', systemPrefersDark);
+    console.log('Media query supported:', mediaQuery.media !== 'not all');
+    
+    const theme = getTheme();
+    console.log('Final theme decision:', theme);
+    return theme;
   }
   
   // Function to apply theme
@@ -30,7 +63,7 @@
   }
   
   // Apply theme immediately
-  const currentTheme = getTheme();
+  const currentTheme = getThemeWithLogging();
   applyTheme(currentTheme);
   
   // Listen for system theme changes
@@ -40,11 +73,21 @@
     try {
       const savedTheme = localStorage.getItem('theme');
       if (!savedTheme) {
-        applyTheme(e.matches ? 'dark' : 'light');
+        // Use the same logic as getTheme() for consistency
+        if (mediaQuery.media !== 'not all') {
+          applyTheme(e.matches ? 'dark' : 'light');
+        } else {
+          // System preference not supported, default to light mode
+          applyTheme('light');
+        }
       }
     } catch (e) {
-      // If localStorage fails, always follow system preference
-      applyTheme(e.matches ? 'dark' : 'light');
+      // If localStorage fails, use system preference if supported, otherwise default to light
+      if (mediaQuery.media !== 'not all') {
+        applyTheme(e.matches ? 'dark' : 'light');
+      } else {
+        applyTheme('light');
+      }
     }
   });
   
@@ -59,6 +102,21 @@
         console.warn('Could not save theme preference');
       }
       applyTheme(theme);
+    },
+    clearTheme: function() {
+      try {
+        localStorage.removeItem('theme');
+        console.log('Cleared saved theme preference');
+        // Reapply theme based on system preference
+        const newTheme = getTheme();
+        applyTheme(newTheme);
+      } catch (e) {
+        console.warn('Could not clear theme preference');
+      }
+    },
+    // Debug version of getTheme with logging
+    getThemeDebug: function() {
+      return getThemeWithLogging();
     }
   };
 })(); 

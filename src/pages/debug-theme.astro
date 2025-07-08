@@ -1,0 +1,127 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Layout title="Theme Debug | Queer Jews">
+  <Header />
+  
+  <main class="bg-gray-50 dark:bg-gray-900">
+    <section class="py-8">
+      <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="content-card">
+          <h1>Theme Debug Page</h1>
+          
+          <div class="space-y-4">
+            <div>
+              <h2>Current Theme Status</h2>
+              <div id="theme-status" class="p-4 bg-gray-100 dark:bg-gray-800 rounded">
+                Loading...
+              </div>
+            </div>
+            
+            <div>
+              <h2>Test Controls</h2>
+              <div class="space-y-2">
+                <button onclick="clearSavedTheme()" class="px-4 py-2 bg-blue-500 text-white rounded">
+                  Clear Saved Theme
+                </button>
+                <button onclick="refreshTheme()" class="px-4 py-2 bg-green-500 text-white rounded">
+                  Refresh Theme
+                </button>
+                <button onclick="forceLight()" class="px-4 py-2 bg-yellow-500 text-white rounded">
+                  Force Light Mode
+                </button>
+                <button onclick="forceDark()" class="px-4 py-2 bg-purple-500 text-white rounded">
+                  Force Dark Mode
+                </button>
+              </div>
+            </div>
+            
+            <div>
+              <h2>System Information</h2>
+              <div id="system-info" class="p-4 bg-gray-100 dark:bg-gray-800 rounded">
+                Loading...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script is:inline>
+  // Make functions globally available
+  window.clearSavedTheme = function() {
+    if (window.themeUtils) {
+      window.themeUtils.clearTheme();
+      updateThemeStatus();
+    }
+  };
+  
+  window.refreshTheme = function() {
+    if (window.themeUtils) {
+      const theme = window.themeUtils.getTheme();
+      window.themeUtils.applyTheme(theme);
+      updateThemeStatus();
+    }
+  };
+  
+  window.forceLight = function() {
+    if (window.themeUtils) {
+      window.themeUtils.setTheme('light');
+      updateThemeStatus();
+    }
+  };
+  
+  window.forceDark = function() {
+    if (window.themeUtils) {
+      window.themeUtils.setTheme('dark');
+      updateThemeStatus();
+    }
+  };
+  
+  function updateThemeStatus() {
+    const statusDiv = document.getElementById('theme-status');
+    const systemDiv = document.getElementById('system-info');
+    
+    if (window.themeUtils) {
+      const currentTheme = window.themeUtils.getTheme();
+      const savedTheme = localStorage.getItem('theme');
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      
+      statusDiv.innerHTML = `
+        <p><strong>Current Theme:</strong> ${currentTheme}</p>
+        <p><strong>Saved Theme:</strong> ${savedTheme || 'none'}</p>
+        <p><strong>System Prefers Dark:</strong> ${mediaQuery.matches}</p>
+        <p><strong>Media Query Supported:</strong> ${mediaQuery.media !== 'not all'}</p>
+        <p><strong>Document Has Dark Class:</strong> ${document.documentElement.classList.contains('dark')}</p>
+      `;
+      
+      systemDiv.innerHTML = `
+        <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+        <p><strong>localStorage Available:</strong> ${typeof(Storage) !== "undefined"}</p>
+        <p><strong>matchMedia Available:</strong> ${typeof window.matchMedia === 'function'}</p>
+      `;
+    } else {
+      statusDiv.innerHTML = '<p>Theme utilities not loaded</p>';
+      systemDiv.innerHTML = '<p>Theme utilities not loaded</p>';
+    }
+  }
+  
+  // Update status when page loads
+  document.addEventListener('DOMContentLoaded', updateThemeStatus);
+  
+  // Update status when theme changes
+  if (window.themeUtils) {
+    const originalSetTheme = window.themeUtils.setTheme;
+    window.themeUtils.setTheme = function(theme) {
+      originalSetTheme.call(this, theme);
+      updateThemeStatus();
+    };
+  }
+</script> 
