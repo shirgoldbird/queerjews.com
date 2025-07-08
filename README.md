@@ -54,7 +54,6 @@ npm run dev
 npm run build    # Build for production
 npm run preview  # Preview production build
 ```
-```
 
 ## Content Management Setup
 
