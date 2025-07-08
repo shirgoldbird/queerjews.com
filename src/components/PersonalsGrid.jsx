@@ -127,7 +127,12 @@ export default function PersonalsGrid({ personals }) {
               </p>
               <div class="personal-bottom-row">
                 <div class="flex flex-wrap gap-2">
-                  {personal.category && <span class="personal-tag">{personal.category}</span>}
+                  {Array.isArray(personal.categories)
+                    ? personal.categories.map((cat) => (
+                        <span class="personal-tag" key={cat}>{cat}</span>
+                      ))
+                    : personal.category && <span class="personal-tag">{personal.category}</span>
+                  }
                 </div>
                 <a
                   href={personal.contact}
