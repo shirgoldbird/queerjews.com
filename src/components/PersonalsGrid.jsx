@@ -118,7 +118,6 @@ export default function PersonalsGrid({ personals }) {
             <article class="personal-card" key={personal.id}>
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs text-gray-700 tracking-wide uppercase font-mono">{byline}</span>
-                <span class="text-xs text-gray-400">#{personal.id}</span>
               </div>
               <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
                 {headline}
