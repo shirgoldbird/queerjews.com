@@ -43,19 +43,19 @@ const fullTitle = `${pageTitle} | Queer Jews`;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f9fafb;
+  background: var(--bg-primary);
 }
 
 .main-content {
   flex: 1;
-  background: #f9fafb;
+  background: var(--bg-primary);
 }
 
 .content-card {
-  background: #fff;
-  border-left: 8px solid #aaf0d1;
+  background: var(--bg-card);
+  border-left: 8px solid var(--border-accent);
   border-radius: 0.5rem;
-  box-shadow: 0 2px 8px 0 rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-card);
   padding: 2.5rem;
   margin-bottom: 0.75rem;
 }
@@ -65,7 +65,7 @@ const fullTitle = `${pageTitle} | Queer Jews`;
   font-family: 'Playfair Display', serif;
   font-size: 2.5rem;
   font-weight: bold;
-  color: #1a1a1a;
+  color: var(--text-primary);
   margin-bottom: 1.5rem;
   letter-spacing: -0.01em;
 }
@@ -74,7 +74,7 @@ const fullTitle = `${pageTitle} | Queer Jews`;
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #1a1a1a;
+  color: var(--text-primary);
   margin-top: 2rem;
   margin-bottom: 0.75rem;
   letter-spacing: -0.01em;
@@ -84,7 +84,7 @@ const fullTitle = `${pageTitle} | Queer Jews`;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 1.125rem;
   line-height: 1.7;
-  color: #374151;
+  color: var(--text-secondary);
   margin-bottom: 1rem;
 }
 
@@ -92,7 +92,7 @@ const fullTitle = `${pageTitle} | Queer Jews`;
   font-family: 'Inter', system-ui, sans-serif;
   font-size: 1.125rem;
   line-height: 1.7;
-  color: #374151;
+  color: var(--text-secondary);
   margin-bottom: 1rem;
   padding-left: 1.5rem;
 }
@@ -102,7 +102,7 @@ const fullTitle = `${pageTitle} | Queer Jews`;
 }
 
 :global(.content-card a) {
-  color: #5ec9a5;
+  color: var(--border-accent);
   text-decoration: underline;
   transition: color 0.15s;
 }
@@ -121,12 +121,12 @@ const fullTitle = `${pageTitle} | Queer Jews`;
   display: inline-flex;
   align-items: center;
   padding: 0.75rem 1.5rem;
-  background: #aaf0d1;
-  color: #1a1a1a !important;
+  background: var(--border-accent);
+  color: var(--text-primary) !important;
   font-size: 1.125rem;
   font-weight: 600;
   border-radius: 0.375rem;
-  border: 1.5px solid #aaf0d1;
+  border: 1.5px solid var(--border-accent);
   text-decoration: none;
   box-shadow: 0 1px 3px 0 rgba(0,0,0,0.04);
   transition: background 0.15s, color 0.15s, border 0.15s;
@@ -135,7 +135,7 @@ const fullTitle = `${pageTitle} | Queer Jews`;
 :global(.content-card .about-button:hover) {
   background: #7be0b2;
   border-color: #7be0b2;
-  color: #1a1a1a !important;
+  color: var(--text-primary) !important;
 }
 
 :global(.content-card .about-button:focus) {

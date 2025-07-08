@@ -12,6 +12,45 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 <!doctype html>
 <html lang="en" class="scroll-smooth">
   <head>
+    <!-- Critical FOUC prevention - must be first -->
+    <script is:inline src="/theme-detection.js"></script>
+    
+    <!-- Critical CSS to prevent FOUC -->
+    <style is:inline>
+      /* Prevent flash by setting initial colors */
+      html { background-color: #f9fafb; color: #1a1a1a; }
+      html.dark { background-color: #111827; color: #f9fafb; }
+      body { background-color: #f9fafb; color: #1a1a1a; }
+      body.dark { background-color: #111827; color: #f9fafb; }
+      
+      /* Critical card styles to prevent FOUC */
+      .header-card, .footer-card, .content-card, .personal-card {
+        background-color: #ffffff;
+        border-left-color: #aaf0d1;
+      }
+      html.dark .header-card, html.dark .footer-card, html.dark .content-card, html.dark .personal-card {
+        background-color: #1f2937;
+        border-left-color: #10b981;
+      }
+      
+      /* Critical text styles */
+      .header-title, .footer-title, h1, h2 {
+        color: #1a1a1a;
+      }
+      html.dark .header-title, html.dark .footer-title, html.dark h1, html.dark h2 {
+        color: #f9fafb;
+      }
+      
+      /* Hide content until theme is applied */
+      .theme-loading { visibility: hidden; }
+      .theme-loaded { visibility: visible; }
+      
+      /* Smooth transitions only after theme is loaded */
+      .theme-loaded * {
+        transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+      }
+    </style>
+    
     <meta charset="UTF-8" />
     <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -50,13 +89,29 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="bg-gray-50 text-gray-900 font-sans antialiased">
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans antialiased theme-loading">
+    <noscript>
+      <style>
+        /* Show content for users with JavaScript disabled */
+        .theme-loading { visibility: visible !important; }
+      </style>
+    </noscript>
+    
     <slot />
+    
+    <!-- Remove theme loading class after page loads -->
+    <script is:inline>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.body.classList.remove('theme-loading');
+        document.body.classList.add('theme-loaded');
+      });
+    </script>
   </body>
 </html>
 
 <style is:global>
   :root {
+    /* Light theme colors */
     --color-primary: #6366f1;
     --color-primary-dark: #4f46e5;
     --color-secondary: #ec4899;
@@ -64,6 +119,30 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-error: #ef4444;
+    
+    /* Theme colors */
+    --bg-primary: #f9fafb;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #1a1a1a;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+    --border-primary: #e5e7eb;
+    --border-accent: #aaf0d1;
+    --shadow-card: 0 2px 8px 0 rgba(0,0,0,0.06);
+  }
+
+  .dark {
+    /* Dark theme colors */
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-card: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-primary: #374151;
+    --border-accent: #10b981;
+    --shadow-card: 0 2px 8px 0 rgba(0,0,0,0.3);
   }
   
   * {
@@ -97,4 +176,5 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   }
 </style>
 
-<link rel="stylesheet" href="/cards.css"> 
+<link rel="stylesheet" href="/cards.css">
+<link rel="stylesheet" href="/dark-mode.css"> 

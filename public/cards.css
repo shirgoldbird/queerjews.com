@@ -12,6 +12,8 @@
   flex-direction: column;
   height: 100%;
 }
+
+
 .personal-tag {
   display: inline-block;
   border: 1.5px solid #aaf0d1;
@@ -30,6 +32,8 @@
   background: #aaf0d1;
   color: #222;
 }
+
+
 .personal-respond {
   display: inline-flex;
   align-items: center;
@@ -53,6 +57,8 @@
   outline: none;
   box-shadow: 0 0 0 3px #aaf0d180;
 }
+
+
 .personal-bottom-row {
   display: flex;
   align-items: center;

@@ -12,7 +12,7 @@ personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_pos
 <Layout title="Queer Jews | Find Your People!">
   <Header />
   
-  <main class="bg-gray-50">
+  <main class="bg-gray-50 dark:bg-gray-900">
     <!-- Content Section -->
     <section class="py-4">
       <div class="w-full xl:max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,11 +21,11 @@ personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_pos
 
         <!-- Empty State -->
         <div id="empty-state" class="hidden text-center py-12">
-          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 12h6m-6-4h6m2 5.291A7.962 7.962 0 0112 15c-2.34 0-4.47-.881-6.08-2.33" />
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">No personals found</h3>
-          <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filters.</p>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No personals found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Try adjusting your search or filters.</p>
         </div>
       </div>
     </section>

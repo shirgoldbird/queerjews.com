@@ -48,35 +48,35 @@ export default function PersonalsGrid({ personals }) {
       <div class="mb-6">
         <div class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
           <div class="flex-1">
-            <label htmlFor="search-input" class="block text-xs font-semibold text-gray-700 mb-1 font-serif">Search</label>
+            <label htmlFor="search-input" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Search</label>
             <input
               type="text"
               id="search-input"
               value={search}
               onInput={e => setSearch(e.target.value)}
               placeholder="Keywords, interests, or topics..."
-              class="block w-full border-0 border-b-2 border-gray-300 bg-transparent px-0 py-1 text-base text-gray-900 placeholder-gray-400 focus:border-gray-800 focus:ring-0 font-sans"
+              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
             />
           </div>
           <div>
-            <label htmlFor="date-filter" class="block text-xs font-semibold text-gray-700 mb-1 font-serif">Sort</label>
+            <label htmlFor="date-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Sort</label>
             <select
               id="date-filter"
               value={sort}
               onChange={e => setSort(e.target.value)}
-              class="block w-full border-0 border-b-2 border-gray-300 bg-transparent px-0 py-1 text-base text-gray-900 focus:border-gray-800 focus:ring-0 font-sans"
+              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
             >
               <option value="newest">Newest first</option>
               <option value="oldest">Oldest first</option>
             </select>
           </div>
           <div>
-            <label htmlFor="category-filter" class="block text-xs font-semibold text-gray-700 mb-1 font-serif">Category</label>
+            <label htmlFor="category-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Category</label>
             <select
               id="category-filter"
               value={category}
               onChange={e => setCategory(e.target.value)}
-              class="block w-full border-0 border-b-2 border-gray-300 bg-transparent px-0 py-1 text-base text-gray-900 focus:border-gray-800 focus:ring-0 font-sans"
+              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
             >
               <option value="">All</option>
               {uniqueCategories.map(cat => (
@@ -85,12 +85,12 @@ export default function PersonalsGrid({ personals }) {
             </select>
           </div>
           <div>
-            <label htmlFor="location-filter" class="block text-xs font-semibold text-gray-700 mb-1 font-serif">Location</label>
+            <label htmlFor="location-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Location</label>
             <select
               id="location-filter"
               value={location}
               onChange={e => setLocation(e.target.value)}
-              class="block w-full border-0 border-b-2 border-gray-300 bg-transparent px-0 py-1 text-base text-gray-900 focus:border-gray-800 focus:ring-0 font-sans"
+              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
             >
               <option value="">All</option>
               {uniqueLocations.map(loc => (
@@ -102,14 +102,14 @@ export default function PersonalsGrid({ personals }) {
             <button
               type="button"
               onClick={() => { setSearch(''); setSort('newest'); setCategory(''); setLocation(''); }}
-              class="text-xs text-gray-600 underline bg-transparent border-0 px-0 py-1 hover:text-gray-900 focus:outline-none font-sans"
+              class="text-xs text-gray-600 dark:text-gray-400 underline bg-transparent border-0 px-0 py-1 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none font-sans"
             >
               Clear
             </button>
           </div>
         </div>
         <div class="flex items-center justify-between mt-2">
-          <p class="text-xs text-gray-600 font-sans">
+          <p class="text-xs text-gray-600 dark:text-gray-400 font-sans">
             {filtered.length === personals.length
               ? `Showing all ${personals.length} personals`
               : `Showing ${filtered.length} of ${personals.length} personals`}
@@ -118,7 +118,7 @@ export default function PersonalsGrid({ personals }) {
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-12 justify-items-start">
         {filtered.length === 0 && (
-          <div class="col-span-2 text-center py-12 text-gray-500">No personals found.</div>
+          <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">No personals found.</div>
         )}
         {filtered.map(personal => {
           const headline = getHeadline(personal);
@@ -126,12 +126,12 @@ export default function PersonalsGrid({ personals }) {
           return (
             <article class="personal-card" key={personal.id}>
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs text-gray-700 tracking-wide uppercase font-mono">{byline}</span>
+                <span class="text-xs text-gray-700 dark:text-gray-300 tracking-wide uppercase font-mono">{byline}</span>
               </div>
-              <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
+              <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
                 {headline}
               </h2>
-              <p class="text-base text-gray-800 leading-relaxed whitespace-pre-wrap font-sans" style="font-family: 'Inter', system-ui, sans-serif;">
+              <p class="text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap font-sans" style="font-family: 'Inter', system-ui, sans-serif;">
                 {personal.personal}
               </p>
               <div class="personal-bottom-row">
@@ -149,7 +149,7 @@ export default function PersonalsGrid({ personals }) {
                   rel="noopener noreferrer"
                   class="personal-respond"
                 >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="#1a1a1a" stroke-width="2" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                   Respond
