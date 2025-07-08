@@ -18,11 +18,14 @@ export default function PersonalsGrid({ personals }) {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
 
+  // Get unique locations from the data
+  const uniqueLocations = [...new Set(personals.map(p => p.location).filter(Boolean))].sort();
+
   let filtered = personals.filter((p) => {
     const text = `${p.title || ''} ${p.personal || ''}`.toLowerCase();
     const matchesSearch = !search || text.includes(search.toLowerCase());
     const matchesCategory = !category || (p.category === category || (Array.isArray(p.categories) && p.categories.map(c => c.toLowerCase()).includes(category)));
-    const matchesLocation = !location || (p.location && p.location.toLowerCase() === location);
+    const matchesLocation = !location || (p.location && p.location === location);
     return matchesSearch && matchesCategory && matchesLocation;
   });
 
@@ -82,10 +85,9 @@ export default function PersonalsGrid({ personals }) {
               class="block w-full border-0 border-b-2 border-gray-300 bg-transparent px-0 py-1 text-base text-gray-900 focus:border-gray-800 focus:ring-0 font-sans"
             >
               <option value="">All</option>
-              <option value="nyc">New York City</option>
-              <option value="la">Los Angeles</option>
-              <option value="chicago">Chicago</option>
-              <option value="online">Online</option>
+              {uniqueLocations.map(loc => (
+                <option key={loc} value={loc}>{loc}</option>
+              ))}
             </select>
           </div>
           <div class="flex items-end">
