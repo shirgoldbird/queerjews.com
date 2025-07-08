@@ -71,7 +71,6 @@ export default function PersonalsGrid({ personals }) {
               <option value="dating">Dating</option>
               <option value="friendship">Friendship</option>
               <option value="community">Community</option>
-              <option value="activity">Activity Partner</option>
             </select>
           </div>
           <div>
