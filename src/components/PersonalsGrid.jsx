@@ -116,7 +116,7 @@ export default function PersonalsGrid({ personals }) {
           </p>
         </div>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 justify-items-start">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 justify-items-start mb-6">
         {filtered.length === 0 && (
           <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">No personals found.</div>
         )}
@@ -159,6 +159,7 @@ export default function PersonalsGrid({ personals }) {
           );
         })}
       </div>
+      <div class="w-full border-t border-gray-700 my-4"></div>
     </>
   );
 } 
