@@ -10,6 +10,7 @@
     "setup": "node scripts/setup-google-api.js",
     "test-sync": "node scripts/test-sync.js",
     "test-real": "node scripts/test-real-sync.js",
+    "test-specific-row": "node scripts/test-specific-row.js",
     "validate-sheet": "node scripts/validate-sheet-structure.js",
     "sync": "node .github/scripts/sync-content.js"
   },
