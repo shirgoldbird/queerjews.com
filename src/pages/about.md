@@ -27,6 +27,10 @@ As my friends will tell you, there's nothing I find more fun than figuring out t
 
 Reach out if you want to chat: [shadchan@queerjews.com](mailto:shadchan@queerjews.com).
 
+## Socials
+
+Follow us on Instagram [@queerjewspersonals](https://instagram.com/queerjewspersonals) for updates!
+
 <div class="about-cta">
   <a href="/submit" class="about-button">Submit a Personal</a>
 </div> 
