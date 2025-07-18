@@ -20,8 +20,16 @@ export default function PersonalsGrid({ personals }) {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
 
-  // Get unique locations from the data
-  const uniqueLocations = [...new Set(personals.map(p => p.location).filter(Boolean))].sort();
+  // Get unique locations from the data (handle both old single location and new location arrays)
+  const allLocations = personals.flatMap(p => {
+    if (Array.isArray(p.locations)) {
+      return p.locations;
+    } else if (p.location) {
+      return [p.location]; // Handle legacy single location format
+    }
+    return [];
+  });
+  const uniqueLocations = [...new Set(allLocations)].sort();
   
   // Get unique categories from the data
   const allCategories = personals.flatMap(p => 
@@ -33,7 +41,10 @@ export default function PersonalsGrid({ personals }) {
     const text = `${p.title || ''} ${p.personal || ''}`.toLowerCase();
     const matchesSearch = !search || text.includes(search.toLowerCase());
     const matchesCategory = !category || (p.category === category || (Array.isArray(p.categories) && p.categories.includes(category)));
-    const matchesLocation = !location || (p.location && p.location === location);
+    const matchesLocation = !location || (
+      (Array.isArray(p.locations) && p.locations.includes(location)) ||
+      (p.location && p.location === location) // Handle legacy single location format
+    );
     return matchesSearch && matchesCategory && matchesLocation;
   });
 
@@ -122,7 +133,11 @@ export default function PersonalsGrid({ personals }) {
         )}
         {filtered.map(personal => {
           const headline = getHeadline(personal);
-          const byline = [personal.location ? personal.location.toUpperCase() : null, formatDate(personal.date_posted)].filter(Boolean).join(' • ');
+          // Handle both new location arrays and legacy single location
+          const locationText = Array.isArray(personal.locations) 
+            ? personal.locations.join(', ').toUpperCase()
+            : (personal.location ? personal.location.toUpperCase() : null);
+          const byline = [locationText, formatDate(personal.date_posted)].filter(Boolean).join(' • ');
           return (
             <article class="personal-card" key={personal.id}>
               <div class="flex items-center justify-between mb-2">

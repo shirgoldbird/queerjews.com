@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { parseSheetData, processPersonals, normalizeLocation, parseCategories } from '../.github/scripts/sync-content.js';
+import { parseSheetData, processPersonals, normalizeLocation, parseCategories, parseLocations } from '../.github/scripts/sync-content.js';
 
 // Sample data that matches the actual Google Sheets format
 const sampleRows = [
@@ -130,6 +130,24 @@ const sampleRows = [
     'P006'
   ],
   
+  // Valid personal 5 - with multiple locations
+  [
+    '2024-01-22 10:00:00',
+    'user8@example.com',
+    'Casey Green',
+    '27',
+    'online, portland',
+    'casey@example.com',
+    'Friendship, Dating',
+    'Digital nomad seeking connections',
+    'I work remotely and split my time between online communities and Portland. Looking for queer Jewish connections both virtually and in person when I\'m in Portland.',
+    'I love hiking, cooking, and discussing queer Jewish literature.',
+    'Yes',
+    'https://forms.gle/editor8',
+    'https://forms.gle/example8',
+    'P008'
+  ],
+  
   // Invalid personal - missing Form Response URL
   [
     '2024-01-21 15:30:00',
@@ -183,7 +201,7 @@ function testProcessPersonals(dataRows, columnMap) {
       console.log(`   ID: ${personal.id}`);
       console.log(`   Title: ${personal.title}`);
       console.log(`   Contact: ${personal.contact}`);
-      console.log(`   Location: ${personal.location}`);
+      console.log(`   Locations: ${personal.locations.join(', ')}`);
       console.log(`   Categories: ${personal.categories.join(', ')}`);
       console.log(`   Date Posted: ${personal.date_posted}`);
       console.log('');
@@ -232,6 +250,23 @@ function testHelperFunctions() {
   locationTests.forEach(test => {
     const result = normalizeLocation(test);
     console.log(`   "${test}" → "${result}"`);
+  });
+  
+  // Test parseLocations
+  console.log('\n📍 Testing parseLocations:');
+  const locationsTests = [
+    'online, portland',
+    'nyc, la, sf',
+    'dc, boston',
+    'Single Location',
+    'online, portland, chicago',
+    '',
+    '  location1  ,  location2  '
+  ];
+  
+  locationsTests.forEach(test => {
+    const result = parseLocations(test);
+    console.log(`   "${test}" → [${result.join(', ')}]`);
   });
   
   console.log('\n✅ Helper functions test passed!');

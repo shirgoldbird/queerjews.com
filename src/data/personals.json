@@ -9,7 +9,9 @@
       "Friendship",
       "Community"
     ],
-    "location": "Online"
+    "locations": [
+      "Online"
+    ]
   },
   {
     "id": "2",
@@ -20,18 +22,22 @@
     "categories": [
       "Dating"
     ],
-    "location": "New York City"
+    "locations": [
+      "New York City"
+    ]
   },
   {
     "id": "3",
     "title": "SEEKING A LOVER AND MUSE",
-    "personal": "to uncover earthly secrets we can only find together. Break my heart, or I’ll break yours. I’ll write you a song if you send me a poem. Married, poly, open to sex but it’s really not the point. Open to light torture, emotional or otherwise. Viet, transmasc, egal, 32 in NYC.",
+    "personal": "to uncover earthly secrets we can only find together. Break my heart, or I'll break yours. I'll write you a song if you send me a poem. Married, poly, open to sex but it's really not the point. Open to light torture, emotional or otherwise. Viet, transmasc, egal, 32 in NYC.",
     "contact": "https://docs.google.com/forms/d/e/1FAIpQLScA_nJLWbQ4Bl9wIy3GwksZ1t2deAcF5_gD95NAw8yUEX2r-g/viewform",
     "date_posted": "2025-07-08",
     "categories": [
       "Friendship",
       "Dating"
     ],
-    "location": "New York City"
-  }
+    "locations": [
+      "New York City"
+    ]
+  
 ]

@@ -352,7 +352,7 @@ function processPersonals(dataRows, columnMap) {
         contact: data.formResponseUrl,
         date_posted: datePosted,
         categories: parseCategories(data.category),
-        location: normalizeLocation(data.location)
+        locations: parseLocations(data.location)
       };
       
       processed.push(personal);
@@ -426,6 +426,16 @@ function normalizeLocation(location) {
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join(' ');
+}
+
+function parseLocations(locationString) {
+  if (!locationString) return [];
+  
+  // Split by comma and clean up each location
+  return locationString
+    .split(',')
+    .map(loc => normalizeLocation(loc.trim()))
+    .filter(loc => loc.length > 0); // Remove empty locations
 }
 
 async function loadExistingPersonals() {
@@ -594,7 +604,7 @@ async function main(testMode = false) {
           console.log(`ID: ${personal.id}`);
           console.log(`Title: ${personal.title}`);
           console.log(`Contact: ${personal.contact}`);
-          console.log(`Location: ${personal.location}`);
+          console.log(`Locations: ${personal.locations.join(', ')}`);
           console.log(`Categories: ${personal.categories.join(', ')}`);
           console.log(`Date Posted: ${personal.date_posted}`);
         });
@@ -633,6 +643,7 @@ export {
   validatePersonal, 
   normalizeLocation, 
   parseCategories,
+  parseLocations,
   validateSpreadsheetStructure,
   fetchSheetData,
   loadCredentials
