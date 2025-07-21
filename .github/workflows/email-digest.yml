@@ -1,0 +1,62 @@
+name: Email Digest
+
+on:
+  schedule:
+    # Weekly digest every Sunday at 10 AM UTC
+    - cron: '0 10 * * 0'
+    # Monthly digest on the 1st of each month at 10 AM UTC
+    - cron: '0 10 1 * *'
+  workflow_dispatch:
+    inputs:
+      frequency:
+        description: 'Digest frequency'
+        required: true
+        default: 'weekly'
+        type: choice
+        options:
+        - weekly
+        - monthly
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Send weekly digest
+      if: github.event_name == 'schedule' && github.event.schedule == '0 10 * * 0'
+      env:
+        GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+        GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+      run: node scripts/send-email-digest.js weekly
+
+    - name: Send monthly digest
+      if: github.event_name == 'schedule' && github.event.schedule == '0 10 1 * *'
+      env:
+        GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+        GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+      run: node scripts/send-email-digest.js monthly
+
+    - name: Send manual digest
+      if: github.event_name == 'workflow_dispatch'
+      env:
+        GOOGLE_SPREADSHEET_ID: ${{ secrets.GOOGLE_SPREADSHEET_ID }}
+        GOOGLE_SHEETS_CREDENTIALS: ${{ secrets.GOOGLE_SHEETS_CREDENTIALS }}
+        RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+      run: node scripts/send-email-digest.js ${{ github.event.inputs.frequency }} 

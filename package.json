@@ -12,7 +12,9 @@
     "test-real": "node scripts/test-real-sync.js",
     "test-specific-row": "node scripts/test-specific-row.js",
     "validate-sheet": "node scripts/validate-sheet-structure.js",
-    "sync": "node .github/scripts/sync-content.js"
+    "sync": "node .github/scripts/sync-content.js",
+    "send-digest": "node scripts/send-email-digest.js",
+    "setup-email": "node scripts/setup-email-service.js"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
