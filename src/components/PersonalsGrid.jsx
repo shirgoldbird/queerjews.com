@@ -19,6 +19,7 @@ export default function PersonalsGrid({ personals }) {
   const [sort, setSort] = useState('newest');
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
+  const [filtersVisible, setFiltersVisible] = useState(false);
 
   // Get unique locations from the data (handle both old single location and new location arrays)
   const allLocations = personals.flatMap(p => {
@@ -57,74 +58,96 @@ export default function PersonalsGrid({ personals }) {
   return (
     <>
       <div class="mb-6">
-        <div class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
-          <div class="flex-1">
-            <label htmlFor="search-input" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Search</label>
-            <input
-              type="text"
-              id="search-input"
-              value={search}
-              onInput={e => setSearch(e.target.value)}
-              placeholder="Keywords, interests, or topics..."
-              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
-            />
-          </div>
-          <div>
-            <label htmlFor="date-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Sort</label>
-            <select
-              id="date-filter"
-              value={sort}
-              onChange={e => setSort(e.target.value)}
-              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
-            >
-              <option value="newest">Newest first</option>
-              <option value="oldest">Oldest first</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="category-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Category</label>
-            <select
-              id="category-filter"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
-            >
-              <option value="">All</option>
-              {uniqueCategories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="location-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Location</label>
-            <select
-              id="location-filter"
-              value={location}
-              onChange={e => setLocation(e.target.value)}
-              class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
-            >
-              <option value="">All</option>
-              {uniqueLocations.map(loc => (
-                <option key={loc} value={loc}>{loc}</option>
-              ))}
-            </select>
-          </div>
-          <div class="flex items-end">
-            <button
-              type="button"
-              onClick={() => { setSearch(''); setSort('newest'); setCategory(''); setLocation(''); }}
-              class="text-xs text-gray-600 dark:text-gray-400 underline bg-transparent border-0 px-0 py-1 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none font-sans"
-            >
-              Clear
-            </button>
-          </div>
-        </div>
-        <div class="flex items-center justify-between mt-2">
+        {/* Mobile filter toggle */}
+        <div class="md:hidden flex items-center justify-between mb-4">
+          <button
+            type="button"
+            onClick={() => setFiltersVisible(!filtersVisible)}
+            class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 font-sans"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
+            </svg>
+            Filters {filtersVisible ? '(Hide)' : '(Show)'}
+          </button>
           <p class="text-xs text-gray-600 dark:text-gray-400 font-sans">
             {filtered.length === personals.length
-              ? `Showing all ${personals.length} personals`
-              : `Showing ${filtered.length} of ${personals.length} personals`}
+              ? `${personals.length} personals`
+              : `${filtered.length} of ${personals.length} personals`}
           </p>
+        </div>
+
+        {/* Filter controls - hidden on mobile when collapsed */}
+        <div class={`${filtersVisible ? 'block' : 'hidden'} md:block`}>
+          <div class="flex flex-col md:flex-row md:items-end gap-4 md:gap-6">
+            <div class="flex-1">
+              <label htmlFor="search-input" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Search</label>
+              <input
+                type="text"
+                id="search-input"
+                value={search}
+                onInput={e => setSearch(e.target.value)}
+                placeholder="Keywords, interests, or topics..."
+                class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
+              />
+            </div>
+            <div>
+              <label htmlFor="date-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Sort</label>
+              <select
+                id="date-filter"
+                value={sort}
+                onChange={e => setSort(e.target.value)}
+                class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
+              >
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="category-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Category</label>
+              <select
+                id="category-filter"
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
+              >
+                <option value="">All</option>
+                {uniqueCategories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="location-filter" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1 font-serif">Location</label>
+              <select
+                id="location-filter"
+                value={location}
+                onChange={e => setLocation(e.target.value)}
+                class="block w-full border-0 border-b-2 border-gray-300 dark:border-gray-600 bg-transparent px-0 py-1 text-base text-gray-900 dark:text-gray-100 focus:border-gray-800 dark:focus:border-gray-400 focus:ring-0 font-sans"
+              >
+                <option value="">All</option>
+                {uniqueLocations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
+            </div>
+            <div class="flex items-end">
+              <button
+                type="button"
+                onClick={() => { setSearch(''); setSort('newest'); setCategory(''); setLocation(''); }}
+                class="text-xs text-gray-600 dark:text-gray-400 underline bg-transparent border-0 px-0 py-1 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none font-sans"
+              >
+                Clear
+              </button>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-2">
+            <p class="text-xs text-gray-600 dark:text-gray-400 font-sans md:block hidden">
+              {filtered.length === personals.length
+                ? `Showing all ${personals.length} personals`
+                : `Showing ${filtered.length} of ${personals.length} personals`}
+            </p>
+          </div>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 justify-items-start mb-6">
