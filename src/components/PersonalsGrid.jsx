@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 
 function formatDate(dateStr) {
   // Parse date as local date to avoid timezone issues
@@ -20,6 +20,20 @@ export default function PersonalsGrid({ personals }) {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
   const [filtersVisible, setFiltersVisible] = useState(false);
+  const [locationMessageDismissed, setLocationMessageDismissed] = useState(false);
+
+  // Check if location message was previously dismissed
+  useEffect(() => {
+    const dismissed = localStorage.getItem('locationMessageDismissed');
+    if (dismissed === 'true') {
+      setLocationMessageDismissed(true);
+    }
+  }, []);
+
+  const dismissLocationMessage = () => {
+    setLocationMessageDismissed(true);
+    localStorage.setItem('locationMessageDismissed', 'true');
+  };
 
   // Get unique locations from the data (handle both old single location and new location arrays)
   const allLocations = personals.flatMap(p => {
@@ -150,6 +164,26 @@ export default function PersonalsGrid({ personals }) {
           </div>
         </div>
       </div>
+      
+      {/* Location encouragement message */}
+      {!locationMessageDismissed && (
+        <div class="mb-6">
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 relative">
+            <button
+              onClick={dismissLocationMessage}
+              class="absolute top-1/2 right-2 transform -translate-y-1/2 text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
+              aria-label="Dismiss message"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <p class="text-sm text-blue-800 dark:text-blue-200 pr-6">
+              Don't see your location? Nobody has submitted a personal for it yet. <a href="/submit" class="font-semibold underline hover:text-blue-600 dark:hover:text-blue-300">Be the first!</a>
+            </p>
+          </div>
+        </div>
+      )}
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6 justify-items-start mb-6">
         {filtered.length === 0 && (
           <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">No personals found.</div>
