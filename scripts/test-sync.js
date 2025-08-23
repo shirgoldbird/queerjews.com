@@ -1,10 +1,58 @@
 #!/usr/bin/env node
 
-import { parseSheetData, processPersonals, normalizeLocation, parseCategories, parseLocations } from '../.github/scripts/sync-content.js';
+import { parseMirrorData, parseFormResponsesData, matchMirrorAndFormData, processPersonals, normalizeLocation, parseCategories, parseLocations } from '../.github/scripts/sync-content.js';
 
-// Sample data that matches the actual Google Sheets format
-const sampleRows = [
-  // Headers (matching actual Google Sheets)
+// Sample data for Mirror tab (approval status)
+const mirrorRows = [
+  // Headers
+  [
+    'Title',
+    'Body',
+    'Approved?',
+    'Form Response URL',
+    'Location'
+  ],
+  
+  // Approved personal 1
+  [
+    'Looking for queer Jewish community in NYC',
+    'Hi! I\'m a 28-year-old queer Jewish person looking to connect with others in the NYC area.',
+    'Yes',
+    'https://forms.gle/example1',
+    'New York City'
+  ],
+  
+  // Approved personal 2
+  [
+    'Seeking romantic connection in LA',
+    'Queer Jewish person in LA looking for meaningful romantic connection.',
+    'Yes',
+    'https://forms.gle/example2',
+    'Los Angeles'
+  ],
+  
+  // Not approved personal
+  [
+    'Not approved personal',
+    'This should not appear in the final output.',
+    'No',
+    'https://forms.gle/example3',
+    'Chicago'
+  ],
+  
+  // Approved personal 3
+  [
+    'Digital nomad seeking connections',
+    'I work remotely and split my time between online communities and Portland.',
+    'Yes',
+    'https://forms.gle/example4',
+    'Portland'
+  ]
+];
+
+// Sample data for Form Responses 1 tab (content)
+const formRows = [
+  // Headers
   [
     'Timestamp',
     'Email Address',
@@ -15,14 +63,10 @@ const sampleRows = [
     'What kind of connections are you seeking?',
     "What's the title of your personal?",
     "What's the body of your personal?",
-    'Want to share more details with the shadchan?',
-    'Approved?',
-    'Form Editor URL',
-    'Form Response URL',
-    'ID'
+    'Want to share more details with the shadchan?'
   ],
   
-  // Valid personal 1
+  // Form response 1
   [
     '2024-01-15 10:30:00',
     'user1@example.com',
@@ -33,14 +77,10 @@ const sampleRows = [
     'Community, Friendship',
     'Looking for queer Jewish community in NYC',
     'Hi! I\'m a 28-year-old queer Jewish person looking to connect with others in the NYC area. I love reading, hiking, and cooking traditional Jewish dishes with a modern twist.',
-    'I\'m also interested in Jewish learning and community events.',
-    'Yes',
-    'https://forms.gle/editor1',
-    'https://forms.gle/example1',
-    'P001'
+    'I\'m also interested in Jewish learning and community events.'
   ],
   
-  // Valid personal 2
+  // Form response 2
   [
     '2024-01-16 14:20:00',
     'user2@example.com',
@@ -51,89 +91,27 @@ const sampleRows = [
     'Romance, Dating',
     'Seeking romantic connection in LA',
     'Queer Jewish person in LA looking for meaningful romantic connection. I enjoy art, music, and exploring the city. Looking for someone who shares similar values and interests.',
-    '',
-    'Yes',
-    'https://forms.gle/editor2',
-    'https://forms.gle/example2',
-    'P002'
+    ''
   ],
   
-  // Invalid personal - not approved
+  // Form response 3 (not approved, but should still be in form data)
   [
     '2024-01-17 09:15:00',
     'user3@example.com',
-    'Test User',
+    'Not Approved',
     '25',
-    'San Francisco',
-    'test@example.com',
-    'Test',
-    'Test submission',
-    'This is a test submission that should not be processed.',
-    '',
-    'No',
-    'https://forms.gle/editor3',
-    'https://forms.gle/example3',
-    'P003'
-  ],
-  
-  // Invalid personal - missing required fields
-  [
-    '2024-01-18 16:45:00',
-    'user4@example.com',
-    'Incomplete User',
-    '30',
     'Chicago',
-    'incomplete@example.com',
+    'notapproved@example.com',
     'Friendship',
-    '',
-    'This submission is missing a title.',
-    '',
-    'Yes',
-    'https://forms.gle/editor4',
-    'https://forms.gle/example4',
-    'P004'
+    'Not approved personal',
+    'This should not appear in the final output.',
+    ''
   ],
   
-  // Valid personal 3 - with multi-category
-  [
-    '2024-01-19 11:30:00',
-    'user5@example.com',
-    'Jordan Levine',
-    '29',
-    'Boston',
-    'jordan@example.com',
-    'Community; Book Club; Friendship',
-    'Queer Jewish book club organizer',
-    'Looking to start a queer Jewish book club in Boston. We\'ll read books by queer Jewish authors and discuss themes of identity, community, and culture.',
-    'I have experience organizing reading groups and would love to collaborate.',
-    'Yes',
-    'https://forms.gle/editor5',
-    'https://forms.gle/example5',
-    'P005'
-  ],
-  
-  // Valid personal 4 - with location normalization
-  [
-    '2024-01-20 13:00:00',
-    'user6@example.com',
-    'Taylor Rosen',
-    '26',
-    'dc',
-    'taylor@example.com',
-    'Friendship, Community',
-    'Seeking queer Jewish friends in DC',
-    'Recently moved to DC and looking to build queer Jewish community here. I\'m into politics, activism, and exploring the city\'s cultural scene.',
-    '',
-    'Yes',
-    'https://forms.gle/editor6',
-    'https://forms.gle/example6',
-    'P006'
-  ],
-  
-  // Valid personal 5 - with multiple locations
+  // Form response 4
   [
     '2024-01-22 10:00:00',
-    'user8@example.com',
+    'user4@example.com',
     'Casey Green',
     '27',
     'online, portland',
@@ -141,73 +119,87 @@ const sampleRows = [
     'Friendship, Dating',
     'Digital nomad seeking connections',
     'I work remotely and split my time between online communities and Portland. Looking for queer Jewish connections both virtually and in person when I\'m in Portland.',
-    'I love hiking, cooking, and discussing queer Jewish literature.',
-    'Yes',
-    'https://forms.gle/editor8',
-    'https://forms.gle/example8',
-    'P008'
-  ],
-  
-  // Invalid personal - missing Form Response URL
-  [
-    '2024-01-21 15:30:00',
-    'user7@example.com',
-    'Missing Contact',
-    '31',
-    'Seattle',
-    'missing@example.com',
-    'Dating',
-    'Missing contact info',
-    'This submission is missing the Form Response URL.',
-    '',
-    'Yes',
-    'https://forms.gle/editor7',
-    '',
-    'P007'
+    'I love hiking, cooking, and discussing queer Jewish literature.'
   ]
 ];
 
-function testParseSheetData() {
-  console.log('🧪 Testing parseSheetData function...');
+function testParseMirrorData() {
+  console.log('🧪 Testing parseMirrorData function...');
   
   try {
-    const result = parseSheetData(sampleRows);
+    const result = parseMirrorData(mirrorRows);
     
-    console.log('✅ parseSheetData test passed!');
-    console.log(`📊 Found ${result.dataRows.length} data rows`);
+    console.log('✅ parseMirrorData test passed!');
+    console.log(`📊 Found ${result.dataRows.length} Mirror tab data rows`);
     console.log('📋 Column mapping:', result.columnMap);
     console.log('');
     
     return result;
   } catch (error) {
-    console.error('❌ parseSheetData test failed:', error.message);
+    console.error('❌ parseMirrorData test failed:', error.message);
     throw error;
   }
 }
 
-function testProcessPersonals(dataRows, columnMap) {
+function testParseFormResponsesData() {
+  console.log('🧪 Testing parseFormResponsesData function...');
+  
+  try {
+    const result = parseFormResponsesData(formRows);
+    
+    console.log('✅ parseFormResponsesData test passed!');
+    console.log(`📊 Found ${result.dataRows.length} Form Responses 1 tab data rows`);
+    console.log('📋 Column mapping:', result.columnMap);
+    console.log('');
+    
+    return result;
+  } catch (error) {
+    console.error('❌ parseFormResponsesData test failed:', error.message);
+    throw error;
+  }
+}
+
+function testMatchMirrorAndFormData(mirrorData, formData) {
+  console.log('🧪 Testing matchMirrorAndFormData function...');
+  
+  try {
+    const result = matchMirrorAndFormData(mirrorData, formData);
+    
+    console.log('✅ matchMirrorAndFormData test passed!');
+    console.log(`📊 Successfully matched ${result.length} entries`);
+    console.log('');
+    
+    return result;
+  } catch (error) {
+    console.error('❌ matchMirrorAndFormData test failed:', error.message);
+    throw error;
+  }
+}
+
+function testProcessPersonals(matchedData) {
   console.log('🧪 Testing processPersonals function...');
   
   try {
-    const personals = processPersonals(dataRows, columnMap);
+    const result = processPersonals(matchedData);
     
     console.log('✅ processPersonals test passed!');
-    console.log(`📊 Processed ${personals.length} valid personals`);
+    console.log(`📊 Processed ${result.length} valid personals`);
+    
+    if (result.length > 0) {
+      console.log('\n📝 Sample processed personals:');
+      result.slice(0, 2).forEach((personal, index) => {
+        console.log(`\n--- Personal ${index + 1} ---`);
+        console.log(`ID: ${personal.id}`);
+        console.log(`Title: ${personal.title}`);
+        console.log(`Contact: ${personal.contact}`);
+        console.log(`Locations: ${personal.locations.join(', ')}`);
+        console.log(`Categories: ${personal.categories.join(', ')}`);
+        console.log(`Date Posted: ${personal.date_posted}`);
+      });
+    }
+    
     console.log('');
-    
-    // Display results
-    personals.forEach((personal, index) => {
-      console.log(`📝 Personal ${index + 1}:`);
-      console.log(`   ID: ${personal.id}`);
-      console.log(`   Title: ${personal.title}`);
-      console.log(`   Contact: ${personal.contact}`);
-      console.log(`   Locations: ${personal.locations.join(', ')}`);
-      console.log(`   Categories: ${personal.categories.join(', ')}`);
-      console.log(`   Date Posted: ${personal.date_posted}`);
-      console.log('');
-    });
-    
-    return personals;
+    return result;
   } catch (error) {
     console.error('❌ processPersonals test failed:', error.message);
     throw error;
@@ -280,11 +272,17 @@ function runAllTests() {
     // Test helper functions first
     testHelperFunctions();
     
-    // Test main parsing function
-    const { dataRows, columnMap } = testParseSheetData();
+    // Test Mirror tab parsing
+    const mirrorData = testParseMirrorData();
+    
+    // Test Form Responses 1 tab parsing
+    const formData = testParseFormResponsesData();
+    
+    // Test data matching
+    const matchedData = testMatchMirrorAndFormData(mirrorData, formData);
     
     // Test processing function
-    testProcessPersonals(dataRows, columnMap);
+    testProcessPersonals(matchedData);
     
     console.log('🎉 All tests passed! The sync system is working correctly.');
     

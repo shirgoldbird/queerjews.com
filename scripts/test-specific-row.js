@@ -3,8 +3,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { parseSheetData, processPersonals, validatePersonal, normalizeLocation, parseCategories, parseLocations } from '../.github/scripts/sync-content.js';
-import { loadCredentials, fetchSheetData } from '../.github/scripts/sync-content.js';
+import { parseMirrorData, parseFormResponsesData, matchMirrorAndFormData, processPersonals, validatePersonal, normalizeLocation, parseCategories, parseLocations } from '../.github/scripts/sync-content.js';
+import { loadCredentials, fetchMirrorData, fetchFormResponsesData } from '../.github/scripts/sync-content.js';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -34,61 +34,32 @@ async function loadExistingPersonals() {
   }
 }
 
-async function savePersonals(personals) {
+function processSpecificRow(mirrorRow, formRow, mirrorMap, formMap, mirrorIndex, formIndex) {
   try {
-    const outputDir = path.dirname(OUTPUT_FILE);
-    await fs.mkdir(outputDir, { recursive: true });
+    console.log(`🔍 Processing Mirror row ${mirrorIndex} and Form row ${formIndex}...`);
     
-    const jsonContent = JSON.stringify(personals, null, 2);
-    await fs.writeFile(OUTPUT_FILE, jsonContent, 'utf8');
-    
-    console.log(`✅ Successfully saved ${personals.length} personals to ${OUTPUT_FILE}`);
-  } catch (error) {
-    throw new ContentSyncError(
-      `Failed to save personals: ${error.message}`,
-      'SAVE_ERROR'
-    );
-  }
-}
-
-function processSpecificRow(row, columnMap, rowIndex) {
-  console.log(`🔍 Processing row ${rowIndex} (spreadsheet row ${rowIndex + 1})...`);
-  
-  try {
-    // Extract data from the specific row
-    const data = {
-      title: row[columnMap.title]?.toString().trim(),
-      body: row[columnMap.body]?.toString().trim(),
-      timestamp: row[columnMap.timestamp]?.toString().trim(),
-      id: row[columnMap.id]?.toString().trim(),
-      formResponseUrl: row[columnMap.formResponseUrl]?.toString().trim(),
-      location: row[columnMap.location]?.toString().trim(),
-      category: row[columnMap.category]?.toString().trim()
+    // Create combined data structure
+    const combinedData = {
+      mirrorRow,
+      formRow,
+      mirrorIndex,
+      formIndex,
+      mirrorMap,
+      formMap
     };
     
-    console.log('📋 Extracted data:');
-    console.log(`   Title: ${data.title || 'MISSING'}`);
-    console.log(`   Body: ${data.body ? `${data.body.length} chars` : 'MISSING'}`);
-    console.log(`   Contact: ${data.formResponseUrl || 'MISSING'}`);
-    console.log(`   Location: ${data.location || 'MISSING'}`);
-    console.log(`   Category: ${data.category || 'MISSING'}`);
-    console.log(`   ID: ${data.id || 'AUTO-GENERATE'}`);
-    console.log(`   Timestamp: ${data.timestamp || 'CURRENT DATE'}`);
+    // Validate the personal
+    const validation = validatePersonal(combinedData);
     
-    // Validate required fields
-    const errors = [];
-    if (!data.title) errors.push('Title missing');
-    if (!data.body) errors.push('Body missing');
-    if (!data.formResponseUrl) errors.push('Form Response URL is required');
-    
-    if (errors.length > 0) {
-      console.log('❌ Validation errors:');
-      errors.forEach(error => console.log(`   - ${error}`));
+    if (!validation.valid) {
+      console.log(`❌ Validation failed: ${validation.errors.join(', ')}`);
       return null;
     }
     
-    // Use ID from the "ID" column if present, otherwise auto-generate
-    const id = data.id || `test-row-${rowIndex}-${Date.now()}`;
+    const data = validation.data;
+    
+    // Generate ID
+    const id = `personal-${Date.now()}-${mirrorIndex}`;
     
     // Parse date from timestamp
     let datePosted = new Date().toISOString().split('T')[0];
@@ -99,7 +70,7 @@ function processSpecificRow(row, columnMap, rowIndex) {
           datePosted = timestamp.toISOString().split('T')[0];
         }
       } catch (e) {
-        console.warn(`⚠️  Invalid timestamp: ${data.timestamp}, using current date`);
+        console.warn(`Invalid timestamp in form row ${formIndex}: ${data.timestamp}`);
       }
     }
     
@@ -124,7 +95,7 @@ function processSpecificRow(row, columnMap, rowIndex) {
     return personal;
     
   } catch (error) {
-    console.error(`❌ Error processing row ${rowIndex}:`, error.message);
+    console.error(`❌ Error processing Mirror row ${mirrorIndex}/Form row ${formIndex}:`, error.message);
     return null;
   }
 }
@@ -135,7 +106,7 @@ async function main() {
     
     if (!rowArg || !rowArg.startsWith('row:')) {
       console.error('❌ Usage: npm run test-specific-row row:N');
-      console.error('   Where N is the spreadsheet row number (1-based)');
+      console.error('   Where N is the Mirror tab row number (1-based)');
       console.error('   Example: npm run test-specific-row row:6');
       process.exit(1);
     }
@@ -147,7 +118,7 @@ async function main() {
       process.exit(1);
     }
     
-    console.log(`🧪 Testing sync for specific row ${rowNumber} from Google Sheets...`);
+    console.log(`🧪 Testing sync for specific Mirror tab row ${rowNumber} from Google Sheets...`);
     console.log('');
     
     // Validate environment
@@ -165,69 +136,121 @@ async function main() {
     console.log('✅ Google authentication successful');
     console.log('');
     
-    // Fetch data
-    console.log('📥 Fetching data from Google Sheets...');
-    const rows = await fetchSheetData(auth);
-    console.log(`📊 Fetched ${rows.length} rows from spreadsheet`);
+    // Fetch data from both tabs
+    console.log('📥 Fetching data from both tabs...');
+    const mirrorRows = await fetchMirrorData(auth);
+    const formRows = await fetchFormResponsesData(auth);
+    console.log(`📊 Fetched ${mirrorRows.length} rows from Mirror tab`);
+    console.log(`📊 Fetched ${formRows.length} rows from Form Responses 1 tab`);
     console.log('');
     
-    // Check if row exists
-    if (rowNumber > rows.length) {
-      console.error(`❌ Row ${rowNumber} does not exist. Spreadsheet only has ${rows.length} rows.`);
+    // Check if row exists in Mirror tab
+    if (rowNumber > mirrorRows.length) {
+      console.error(`❌ Row ${rowNumber} does not exist in Mirror tab. Tab only has ${mirrorRows.length} rows.`);
       process.exit(1);
     }
     
-    // Parse sheet data
+    // Parse both tabs
     console.log('🔍 Parsing spreadsheet structure...');
-    const { dataRows, columnMap } = parseSheetData(rows);
-    console.log(`📋 Found ${dataRows.length} data rows`);
-    console.log('📋 Column mapping:', columnMap);
+    const mirrorData = parseMirrorData(mirrorRows);
+    const formData = parseFormResponsesData(formRows);
+    console.log(`📋 Found ${mirrorData.dataRows.length} Mirror tab data rows`);
+    console.log(`📋 Found ${formData.dataRows.length} Form Responses 1 tab data rows`);
     console.log('');
     
     // Calculate the actual row index in dataRows (accounting for header row)
-    const dataRowIndex = rowNumber - 2; // -2 because: -1 for 0-based indexing, -1 for header row
+    const mirrorRowIndex = rowNumber - 2; // -2 for 1-based indexing and header row
     
-    if (dataRowIndex < 0 || dataRowIndex >= dataRows.length) {
-      console.error(`❌ Row ${rowNumber} is not a valid data row.`);
-      console.error(`   Valid data rows are from 2 to ${dataRows.length + 1}`);
+    if (mirrorRowIndex < 0 || mirrorRowIndex >= mirrorData.dataRows.length) {
+      console.error(`❌ Row ${rowNumber} is out of range for data rows.`);
       process.exit(1);
     }
     
-    // Process the specific row
-    const personal = processSpecificRow(dataRows[dataRowIndex], columnMap, dataRowIndex);
+    const mirrorRow = mirrorData.dataRows[mirrorRowIndex];
+    const mirrorTitle = mirrorRow[mirrorData.columnMap.title]?.toString().trim();
+    const isApproved = mirrorRow[mirrorData.columnMap.approved]?.toString().toLowerCase().trim();
     
-    if (!personal) {
-      console.error('❌ Failed to process the specified row.');
-      process.exit(1);
-    }
-    
+    console.log(`📋 Mirror row ${rowNumber} details:`);
+    console.log(`   Title: "${mirrorTitle}"`);
+    console.log(`   Approved: "${isApproved}"`);
     console.log('');
     
-    // Load existing personals
-    console.log('📂 Loading existing personals...');
+    // Check if approved
+    if (isApproved !== 'yes' && isApproved !== 'true' && isApproved !== '1') {
+      console.log('❌ This row is not approved, so it will not be processed.');
+      process.exit(0);
+    }
+    
+    // Find matching form response by title
+    const titleKey = mirrorTitle.toLowerCase();
+    let matchingFormRow = null;
+    let matchingFormIndex = -1;
+    
+    for (let i = 0; i < formData.dataRows.length; i++) {
+      const formRow = formData.dataRows[i];
+      const formTitle = formRow[formData.columnMap.title]?.toString().trim();
+      if (formTitle && formTitle.toLowerCase() === titleKey) {
+        matchingFormRow = formRow;
+        matchingFormIndex = i + 2; // +2 for 1-based indexing and header row
+        break;
+      }
+    }
+    
+    if (!matchingFormRow) {
+      console.error(`❌ No matching form response found for title: "${mirrorTitle}"`);
+      console.log('Available form response titles:');
+      formData.dataRows.forEach((row, index) => {
+        const title = row[formData.columnMap.title]?.toString().trim();
+        if (title) {
+          console.log(`   ${index + 2}: "${title}"`);
+        }
+      });
+      process.exit(1);
+    }
+    
+    console.log(`✅ Found matching form response at row ${matchingFormIndex}`);
+    console.log('');
+    
+    // Process the specific row
+    const personal = processSpecificRow(
+      mirrorRow,
+      matchingFormRow,
+      mirrorData.columnMap,
+      formData.columnMap,
+      rowNumber,
+      matchingFormIndex
+    );
+    
+    if (!personal) {
+      console.log('❌ Failed to process the personal.');
+      process.exit(1);
+    }
+    
+    // Load existing personals and add the new one
+    console.log('🔄 Loading existing personals...');
     const existingPersonals = await loadExistingPersonals();
     console.log(`📊 Found ${existingPersonals.length} existing personals`);
     
-    // Check if personal with same ID already exists
-    const existingIndex = existingPersonals.findIndex(p => p.id === personal.id);
-    
+    // Check if this personal already exists (by title)
+    const existingIndex = existingPersonals.findIndex(p => p.title === personal.title);
     if (existingIndex !== -1) {
-      console.log(`⚠️  Personal with ID "${personal.id}" already exists. Replacing it.`);
+      console.log('⚠️  Personal with this title already exists. Updating...');
       existingPersonals[existingIndex] = personal;
     } else {
-      console.log('➕ Adding new personal to existing data...');
+      console.log('✅ Adding new personal...');
       existingPersonals.push(personal);
     }
     
     // Save to file
     console.log('💾 Saving personals to JSON file...');
-    await savePersonals(existingPersonals);
+    const outputDir = path.dirname(OUTPUT_FILE);
+    await fs.mkdir(outputDir, { recursive: true });
     
-    console.log('');
-    console.log('🎉 Successfully processed and saved the personal!');
-    console.log(`📝 The personal is now available at: ${OUTPUT_FILE}`);
-    console.log('');
-    console.log('💡 You can view it on the website or check the JSON file directly.');
+    const jsonContent = JSON.stringify(existingPersonals, null, 2);
+    await fs.writeFile(OUTPUT_FILE, jsonContent, 'utf8');
+    
+    console.log(`✅ Successfully saved ${existingPersonals.length} personals to ${OUTPUT_FILE}`);
+    console.log('🎉 Specific row test completed successfully!');
     
   } catch (error) {
     console.error(`❌ Test failed: ${error.message}`);

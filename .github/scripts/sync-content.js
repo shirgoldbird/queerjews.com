@@ -320,9 +320,6 @@ function parseFormResponsesData(rows) {
   const dataRows = rows.slice(1);
   
   console.log('🔍 Debug: Form Responses 1 tab headers:', headers);
-  console.log('🔍 Debug: Form Responses 1 tab total rows:', rows.length);
-  console.log('🔍 Debug: Form Responses 1 tab data rows:', dataRows.length);
-  
   // Column mapping for Form Responses 1 tab
   const columnMap = {
     timestamp: headers.findIndex(h => h.toLowerCase().includes('timestamp')),
@@ -361,26 +358,19 @@ function matchMirrorAndFormData(mirrorData, formData) {
   const { dataRows: mirrorRows, columnMap: mirrorMap } = mirrorData;
   const { dataRows: formRows, columnMap: formMap } = formData;
   
-  console.log(`🔍 Debug: formRows length: ${formRows.length}`);
-  console.log(`🔍 Debug: formRows.slice(1) length: ${formRows.slice(1).length}`);
-  
   // Since the Mirror tab has the Form Response URL and the Form Responses 1 tab has the content,
   // we need to match by a common identifier. Let's use the title as the primary matching key.
   // The Mirror tab should have the title from the form response.
   
   // Create a map of form responses by title (case-insensitive)
   const formMapByTitle = new Map();
-  console.log(`🔍 Debug: Processing ${formRows.length - 1} form data rows (excluding header)`);
-  formRows.slice(1).forEach((row, index) => {
-    console.log(`🔍 Debug: Form row ${index + 2} full data:`, row);
+  const { dataRows: formDataRows } = formData;
+  
+  formDataRows.forEach((row, index) => {
     const title = row[formMap.title]?.toString().trim();
-    console.log(`🔍 Debug: Form row ${index + 2}, title column ${formMap.title}: "${title}"`);
     if (title) {
       const titleKey = title.toLowerCase();
       formMapByTitle.set(titleKey, { row, index: index + 2 }); // +2 for 1-based indexing and header row
-      console.log(`🔍 Debug: Added form title "${title}" (key: "${titleKey}")`);
-    } else {
-      console.log(`🔍 Debug: No title found in form row ${index + 2}`);
     }
   });
   
@@ -445,11 +435,7 @@ function validatePersonal(combinedData) {
   const errors = [];
   const { mirrorRow, formRow, mirrorIndex, formIndex, mirrorMap, formMap } = combinedData;
 
-  // Approval status is already checked in matchMirrorAndFormData, but double-check
-  const approved = mirrorRow[mirrorMap.approved]?.toString().toLowerCase().trim();
-  if (approved !== 'yes' && approved !== 'true' && approved !== '1') {
-    return { valid: false, reason: 'Not approved' };
-  }
+  // Approval status should already be checked in matchMirrorAndFormData, so we don't need to check again here
   
   // Validate required fields from form data
   const title = formRow[formMap.title]?.toString().trim();

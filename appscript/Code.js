@@ -5,14 +5,21 @@
 
 // Configuration - Update these based on your sheet structure
 const CONFIG = {
-  // Column header mappings (case-insensitive fuzzy matching)
-  COLUMN_MAPPINGS: {
-    EMAIL: ["email", "email address"],
+  // Column header mappings for Mirror tab (case-insensitive fuzzy matching)
+  MIRROR_COLUMN_MAPPINGS: {
     TITLE: ["title", "title of your personal"],
     BODY: ["body", "body of your personal"],
     APPROVED: ["approved"],
     FORM_EDITOR_URL: ["form editor url", "editor url"],
     FORM_RESPONSE_URL: ["form response url", "response url"],
+  },
+
+  // Column header mappings for Form Responses 1 tab (case-insensitive fuzzy matching)
+  FORM_COLUMN_MAPPINGS: {
+    EMAIL: ["email", "email address"],
+    TITLE: ["title", "title of your personal"],
+    BODY: ["body", "body of your personal"],
+    TIMESTAMP: ["timestamp"],
   },
 
   // Form template settings
@@ -64,16 +71,13 @@ const CONFIG = {
 };
 
 // Cache for column indices to avoid repeated header parsing
-let COLUMN_INDICES = null;
+let MIRROR_COLUMN_INDICES = null;
+let FORM_COLUMN_INDICES = null;
 
 /**
  * Helper function to find column indices based on header names
  */
-function getColumnIndices(sheet) {
-  if (COLUMN_INDICES !== null) {
-    return COLUMN_INDICES;
-  }
-
+function getColumnIndices(sheet, mappings) {
   try {
     const headers = sheet
       .getRange(1, 1, 1, sheet.getLastColumn())
@@ -93,8 +97,8 @@ function getColumnIndices(sheet) {
     };
 
     // Find each required column
-    Object.keys(CONFIG.COLUMN_MAPPINGS).forEach((key) => {
-      const searchTerms = CONFIG.COLUMN_MAPPINGS[key];
+    Object.keys(mappings).forEach((key) => {
+      const searchTerms = mappings[key];
       const foundIndex = headers.findIndex((header) =>
         fuzzyMatch(header, searchTerms)
       );
@@ -115,23 +119,6 @@ function getColumnIndices(sheet) {
       }
     });
 
-    // Validate that we found all required columns
-    const requiredColumns = [
-      "EMAIL",
-      "TITLE",
-      "APPROVED",
-      "FORM_EDITOR_URL",
-      "FORM_RESPONSE_URL",
-    ];
-    const missingColumns = requiredColumns.filter(
-      (col) => indices[col] === undefined
-    );
-
-    if (missingColumns.length > 0) {
-      throw new Error(`Missing required columns: ${missingColumns.join(", ")}`);
-    }
-
-    COLUMN_INDICES = indices;
     return indices;
   } catch (error) {
     console.error("Error parsing column headers:", error);
@@ -140,11 +127,110 @@ function getColumnIndices(sheet) {
 }
 
 /**
- * Helper function to extract data from row
+ * Helper function to get Mirror tab column indices
  */
-function extractRowData(rowData, columnIndices) {
+function getMirrorColumnIndices() {
+  if (MIRROR_COLUMN_INDICES !== null) {
+    return MIRROR_COLUMN_INDICES;
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Mirror");
+  if (!sheet) {
+    throw new Error("Mirror sheet not found");
+  }
+
+  const indices = getColumnIndices(sheet, CONFIG.MIRROR_COLUMN_MAPPINGS);
+
+  // Validate that we found all required columns for Mirror tab
+  const requiredColumns = ["TITLE", "APPROVED", "FORM_EDITOR_URL", "FORM_RESPONSE_URL"];
+  const missingColumns = requiredColumns.filter(
+    (col) => indices[col] === undefined
+  );
+
+  if (missingColumns.length > 0) {
+    throw new Error(`Missing required columns in Mirror tab: ${missingColumns.join(", ")}`);
+  }
+
+  MIRROR_COLUMN_INDICES = indices;
+  return indices;
+}
+
+/**
+ * Helper function to get Form Responses 1 tab column indices
+ */
+function getFormColumnIndices() {
+  if (FORM_COLUMN_INDICES !== null) {
+    return FORM_COLUMN_INDICES;
+  }
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+  if (!sheet) {
+    throw new Error("Form Responses 1 sheet not found");
+  }
+
+  const indices = getColumnIndices(sheet, CONFIG.FORM_COLUMN_MAPPINGS);
+
+  // Validate that we found all required columns for Form Responses 1 tab
+  const requiredColumns = ["EMAIL", "TITLE", "TIMESTAMP"];
+  const missingColumns = requiredColumns.filter(
+    (col) => indices[col] === undefined
+  );
+
+  if (missingColumns.length > 0) {
+    throw new Error(`Missing required columns in Form Responses 1 tab: ${missingColumns.join(", ")}`);
+  }
+
+  FORM_COLUMN_INDICES = indices;
+  return indices;
+}
+
+/**
+ * Helper function to find matching form response by title
+ */
+function findMatchingFormResponse(title) {
+  try {
+    const formSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+    if (!formSheet) {
+      throw new Error("Form Responses 1 sheet not found");
+    }
+
+    const formIndices = getFormColumnIndices();
+    const formHeaders = formSheet.getRange(1, 1, 1, formSheet.getLastColumn()).getValues()[0];
+    const formData = formSheet.getRange(2, 1, formSheet.getLastRow() - 1, formSheet.getLastColumn()).getValues();
+
+    console.log(`Looking for form response with title: "${title}"`);
+
+    // Find the matching form response by title
+    for (let i = 0; i < formData.length; i++) {
+      const row = formData[i];
+      const formTitle = row[formIndices.TITLE];
+      
+      if (formTitle && formTitle.toString().trim().toLowerCase() === title.toString().trim().toLowerCase()) {
+        console.log(`✅ Found matching form response at row ${i + 2}`);
+        
+        return {
+          email: row[formIndices.EMAIL],
+          title: row[formIndices.TITLE],
+          body: row[formIndices.BODY] || "",
+          timestamp: row[formIndices.TIMESTAMP],
+          rowIndex: i + 2
+        };
+      }
+    }
+
+    console.log(`❌ No matching form response found for title: "${title}"`);
+    return null;
+  } catch (error) {
+    console.error("Error finding matching form response:", error);
+    throw error;
+  }
+}
+
+/**
+ * Helper function to extract data from Mirror tab row
+ */
+function extractMirrorRowData(rowData, columnIndices) {
   const data = {
-    email: rowData[columnIndices.EMAIL],
     title: rowData[columnIndices.TITLE],
     body: rowData[columnIndices.BODY] || "", // Body is optional
     approved: rowData[columnIndices.APPROVED],
@@ -152,8 +238,7 @@ function extractRowData(rowData, columnIndices) {
     existingResponseUrl: rowData[columnIndices.FORM_RESPONSE_URL],
   };
 
-  console.log("Extracted row data:", {
-    email: data.email ? `${data.email.substring(0, 10)}...` : "MISSING",
+  console.log("Extracted Mirror row data:", {
     title: data.title ? `"${data.title.substring(0, 30)}..."` : "MISSING",
     body: data.body ? `${data.body.length} chars` : "EMPTY",
     approved: data.approved,
@@ -226,14 +311,14 @@ function onApprovalEdit(e) {
       return;
     }
 
-    // Get column indices
-    const columnIndices = getColumnIndices(sheet);
+    // Get Mirror tab column indices
+    const mirrorIndices = getMirrorColumnIndices();
 
     // Check if the edit was made to the APPROVED column
-    if (column !== columnIndices.APPROVED + 1) {
+    if (column !== mirrorIndices.APPROVED + 1) {
       console.log(
         `Edit not in APPROVED column (expected: ${
-          columnIndices.APPROVED + 1
+          mirrorIndices.APPROVED + 1
         }, got: ${column}), exiting`
       );
       return;
@@ -252,57 +337,74 @@ function onApprovalEdit(e) {
 
     console.log(`Processing approval for row ${row}...`);
 
-    // Get data from the row on the Mirror sheet
-    let rowData;
+    // Get data from the Mirror tab row
+    let mirrorRowData;
     try {
-      rowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
+      mirrorRowData = sheet.getRange(row, 1, 1, sheet.getLastColumn()).getValues()[0];
       console.log(
-        `Retrieved ${rowData.length} columns of data from row ${row}`
+        `Retrieved ${mirrorRowData.length} columns of data from Mirror row ${row}`
       );
     } catch (error) {
-      console.error("Error retrieving row data:", error);
+      console.error("Error retrieving Mirror row data:", error);
       return;
     }
 
-    // Extract and validate data
-    const data = extractRowData(rowData, columnIndices);
-    const validationErrors = validateRowData(data);
+    // Extract data from Mirror tab
+    const mirrorData = extractMirrorRowData(mirrorRowData, mirrorIndices);
 
+    // Find matching form response in Form Responses 1 tab
+    const formData = findMatchingFormResponse(mirrorData.title);
+    if (!formData) {
+      throw new Error(`No matching form response found for title: "${mirrorData.title}"`);
+    }
+
+    // Combine the data
+    const combinedData = {
+      email: formData.email,
+      title: formData.title,
+      body: formData.body,
+      approved: mirrorData.approved,
+      existingEditUrl: mirrorData.existingEditUrl,
+      existingResponseUrl: mirrorData.existingResponseUrl,
+    };
+
+    // Validate combined data
+    const validationErrors = validateRowData(combinedData);
     if (validationErrors.length > 0) {
       console.error("Validation errors:", validationErrors);
       throw new Error(`Data validation failed: ${validationErrors.join(", ")}`);
     }
 
     // Check if a form has already been generated for this row
-    if (data.existingEditUrl && data.existingEditUrl.trim() !== "") {
+    if (combinedData.existingEditUrl && combinedData.existingEditUrl.trim() !== "") {
       console.log(
-        `Form already exists for row ${row}: ${data.existingEditUrl}`
+        `Form already exists for row ${row}: ${combinedData.existingEditUrl}`
       );
       return;
     }
 
-    console.log(`Generating form for: "${data.title}"`);
+    console.log(`Generating form for: "${combinedData.title}"`);
 
     // Generate the form
-    const result = generateCustomForm(data);
+    const result = generateCustomForm(combinedData);
 
     if (result && result.formEditUrl) {
       try {
         sheet
-          .getRange(row, columnIndices.FORM_EDITOR_URL + 1)
+          .getRange(row, mirrorIndices.FORM_EDITOR_URL + 1)
           .setValue(result.formEditUrl);
         sheet
-          .getRange(row, columnIndices.FORM_RESPONSE_URL + 1)
+          .getRange(row, mirrorIndices.FORM_RESPONSE_URL + 1)
           .setValue(result.formResponseUrl);
         console.log(
-          `✅ Form created successfully and URLs saved to row ${row}`
+          `✅ Form created successfully and URLs saved to Mirror row ${row}`
         );
       } catch (error) {
         console.error("Error saving URLs to sheet:", error);
         throw error;
       }
       try {
-        sendApprovalNotificationEmail(data, result.formEditUrl);
+        sendApprovalNotificationEmail(combinedData, result.formEditUrl);
       } catch (error) {
         console.error("Error sending approval email:", error);
         throw error;
@@ -548,33 +650,58 @@ function testFormGeneration() {
     console.log("=== Starting test form generation ===");
 
     // Clear column indices cache to force re-parsing
-    COLUMN_INDICES = null;
+    MIRROR_COLUMN_INDICES = null;
+    FORM_COLUMN_INDICES = null;
 
-    const sheet =
+    const mirrorSheet =
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Mirror");
-    if (!sheet) {
+    if (!mirrorSheet) {
       throw new Error("Mirror sheet not found");
     }
 
+    const formSheet =
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
+    if (!formSheet) {
+      throw new Error("Form Responses 1 sheet not found");
+    }
+
     // Get column indices
-    const columnIndices = getColumnIndices(sheet);
+    const mirrorIndices = getMirrorColumnIndices();
+    const formIndices = getFormColumnIndices();
 
-    // Create test data array with proper length
-    const testRowData = new Array(sheet.getLastColumn()).fill("");
-
-    // Fill in test data at correct indices
-    testRowData[0] = new Date().toISOString(); // Timestamp
-    testRowData[columnIndices.EMAIL] = "sarah.test@example.com";
-    testRowData[columnIndices.TITLE] =
+    // Create test data for Mirror tab
+    const testMirrorRowData = new Array(mirrorSheet.getLastColumn()).fill("");
+    testMirrorRowData[mirrorIndices.TITLE] =
       "Creative professional seeking meaningful connection";
-    testRowData[columnIndices.BODY] =
+    testMirrorRowData[mirrorIndices.BODY] =
       "Artist and coffee enthusiast looking for someone who appreciates long walks, deep conversations, and Sunday morning farmers markets.";
-    testRowData[columnIndices.APPROVED] = true;
-    testRowData[columnIndices.FORM_EDITOR_URL] = "";
-    testRowData[columnIndices.FORM_RESPONSE_URL] = "";
+    testMirrorRowData[mirrorIndices.APPROVED] = true;
+    testMirrorRowData[mirrorIndices.FORM_EDITOR_URL] = "";
+    testMirrorRowData[mirrorIndices.FORM_RESPONSE_URL] = "";
 
-    const data = extractRowData(testRowData, columnIndices);
-    const validationErrors = validateRowData(data);
+    // Create test data for Form Responses 1 tab
+    const testFormRowData = new Array(formSheet.getLastColumn()).fill("");
+    testFormRowData[formIndices.EMAIL] = "sarah.test@example.com";
+    testFormRowData[formIndices.TITLE] =
+      "Creative professional seeking meaningful connection";
+    testFormRowData[formIndices.BODY] =
+      "Artist and coffee enthusiast looking for someone who appreciates long walks, deep conversations, and Sunday morning farmers markets.";
+    testFormRowData[formIndices.TIMESTAMP] = new Date().toISOString();
+
+    // Extract data from Mirror tab
+    const mirrorData = extractMirrorRowData(testMirrorRowData, mirrorIndices);
+
+    // Create combined data structure
+    const combinedData = {
+      email: testFormRowData[formIndices.EMAIL],
+      title: testFormRowData[formIndices.TITLE],
+      body: testFormRowData[formIndices.BODY],
+      approved: mirrorData.approved,
+      existingEditUrl: mirrorData.existingEditUrl,
+      existingResponseUrl: mirrorData.existingResponseUrl,
+    };
+
+    const validationErrors = validateRowData(combinedData);
 
     if (validationErrors.length > 0) {
       throw new Error(
@@ -582,14 +709,14 @@ function testFormGeneration() {
       );
     }
 
-    console.log(`Testing form generation for: "${data.title}"`);
+    console.log(`Testing form generation for: "${combinedData.title}"`);
 
-    const result = generateCustomForm(data);
+    const result = generateCustomForm(combinedData);
 
     if (result && result.formEditUrl) {
       console.log(`✅ Test successful! Form Edit URL: ${result.formEditUrl}`);
       console.log(`✅ Form Response URL: ${result.formResponseUrl}`);
-      sendApprovalNotificationEmail(data, result.formEditUrl);
+      sendApprovalNotificationEmail(combinedData, result.formEditUrl);
       SpreadsheetApp.getUi().alert(
         "Test Successful",
         `Form created successfully!\n\nEdit URL: ${result.formEditUrl}\n\nResponse URL: ${result.formResponseUrl}`,
@@ -626,22 +753,40 @@ function getColumnLetter(columnIndex) {
  */
 function analyzeSheetStructure() {
   try {
-    const sheet =
+    const mirrorSheet =
       SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Mirror");
+    const formSheet =
+      SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Form Responses 1");
 
-    if (!sheet) {
+    if (!mirrorSheet) {
       throw new Error("Mirror sheet not found");
     }
 
-    // Clear cache to force re-parsing
-    COLUMN_INDICES = null;
+    if (!formSheet) {
+      throw new Error("Form Responses 1 sheet not found");
+    }
 
-    const headers = sheet
-      .getRange(1, 1, 1, sheet.getLastColumn())
+    // Clear cache to force re-parsing
+    MIRROR_COLUMN_INDICES = null;
+    FORM_COLUMN_INDICES = null;
+
+    const mirrorHeaders = mirrorSheet
+      .getRange(1, 1, 1, mirrorSheet.getLastColumn())
       .getValues()[0];
 
-    console.log("=== Sheet Structure Analysis ===");
-    headers.forEach((header, index) => {
+    const formHeaders = formSheet
+      .getRange(1, 1, 1, formSheet.getLastColumn())
+      .getValues()[0];
+
+    console.log("=== Mirror Sheet Structure Analysis ===");
+    mirrorHeaders.forEach((header, index) => {
+      console.log(
+        `Column ${getColumnLetter(index)} (index ${index}): ${header}`
+      );
+    });
+
+    console.log("=== Form Responses 1 Sheet Structure Analysis ===");
+    formHeaders.forEach((header, index) => {
       console.log(
         `Column ${getColumnLetter(index)} (index ${index}): ${header}`
       );
@@ -649,13 +794,24 @@ function analyzeSheetStructure() {
 
     // Also show the parsed column indices
     try {
-      const columnIndices = getColumnIndices(sheet);
+      const mirrorIndices = getMirrorColumnIndices();
+      const formIndices = getFormColumnIndices();
       console.log("=== Parsed Column Mappings ===");
-      Object.keys(columnIndices).forEach((key) => {
-        const index = columnIndices[key];
+      console.log("Mirror Tab:");
+      Object.keys(mirrorIndices).forEach((key) => {
+        const index = mirrorIndices[key];
         console.log(
           `${key}: Column ${getColumnLetter(index)} (index ${index}) - "${
-            headers[index]
+            mirrorHeaders[index]
+          }"`
+        );
+      });
+      console.log("Form Responses 1 Tab:");
+      Object.keys(formIndices).forEach((key) => {
+        const index = formIndices[key];
+        console.log(
+          `${key}: Column ${getColumnLetter(index)} (index ${index}) - "${
+            formHeaders[index]
           }"`
         );
       });
@@ -664,14 +820,22 @@ function analyzeSheetStructure() {
     }
 
     const ui = SpreadsheetApp.getUi();
-    const headerList = headers
+    const mirrorHeaderList = mirrorHeaders
       .map(
         (header, index) =>
           `Column ${getColumnLetter(index)} (index ${index}): ${header}`
       )
       .join("\n");
 
-    ui.alert("Sheet Structure - Mirror Tab", headerList, ui.ButtonSet.OK);
+    const formHeaderList = formHeaders
+      .map(
+        (header, index) =>
+          `Column ${getColumnLetter(index)} (index ${index}): ${header}`
+      )
+      .join("\n");
+
+    ui.alert("Sheet Structure - Mirror Tab", mirrorHeaderList, ui.ButtonSet.OK);
+    ui.alert("Sheet Structure - Form Responses 1 Tab", formHeaderList, ui.ButtonSet.OK);
   } catch (error) {
     console.error("Error analyzing sheet structure:", error);
     SpreadsheetApp.getUi().alert(
@@ -701,7 +865,8 @@ function onOpen() {
  * Helper function to clear the column indices cache
  */
 function clearColumnCache() {
-  COLUMN_INDICES = null;
+  MIRROR_COLUMN_INDICES = null;
+  FORM_COLUMN_INDICES = null;
   console.log('Column indices cache cleared');
   SpreadsheetApp.getUi().alert('Cache Cleared', 'Column indices cache has been cleared. The script will re-parse headers on next use.', SpreadsheetApp.getUi().ButtonSet.OK);
 }
@@ -711,20 +876,34 @@ function clearColumnCache() {
  */
 function showCurrentConfig() {
   try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Mirror');
-    if (!sheet) {
+    const mirrorSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Mirror');
+    const formSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Form Responses 1');
+    
+    if (!mirrorSheet) {
       throw new Error('Mirror sheet not found');
     }
     
-    const columnIndices = getColumnIndices(sheet);
-    const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    if (!formSheet) {
+      throw new Error('Form Responses 1 sheet not found');
+    }
+    
+    const mirrorIndices = getMirrorColumnIndices();
+    const formIndices = getFormColumnIndices();
+    const mirrorHeaders = mirrorSheet.getRange(1, 1, 1, mirrorSheet.getLastColumn()).getValues()[0];
+    const formHeaders = formSheet.getRange(1, 1, 1, formSheet.getLastColumn()).getValues()[0];
     
     let configText = 'CURRENT CONFIGURATION:\n\n';
-    configText += 'Column Mappings:\n';
+    configText += 'Mirror Tab Column Mappings:\n';
     
-    Object.keys(columnIndices).forEach(key => {
-      const index = columnIndices[key];
-      configText += `• ${key}: Column ${getColumnLetter(index)} - "${headers[index]}"\n`;
+    Object.keys(mirrorIndices).forEach(key => {
+      const index = mirrorIndices[key];
+      configText += `• ${key}: Column ${getColumnLetter(index)} - "${mirrorHeaders[index]}"\n`;
+    });
+    
+    configText += '\nForm Responses 1 Tab Column Mappings:\n';
+    Object.keys(formIndices).forEach(key => {
+      const index = formIndices[key];
+      configText += `• ${key}: Column ${getColumnLetter(index)} - "${formHeaders[index]}"\n`;
     });
     
     configText += '\nForm Fields:\n';
