@@ -106,6 +106,14 @@ async function fetchSheetData(auth, range = 'Mirror!A:O') {
   }
 }
 
+async function fetchMirrorData(auth) {
+  return await fetchSheetData(auth, 'Mirror!A:O');
+}
+
+async function fetchFormResponsesData(auth) {
+  return await fetchSheetData(auth, 'Form Responses 1!A:Z');
+}
+
 async function getSpreadsheetMetadata(auth) {
   try {
     const sheets = google.sheets({ version: 'v4', auth });
@@ -133,34 +141,30 @@ async function validateSpreadsheetStructure(auth) {
     const metadata = await getSpreadsheetMetadata(auth);
     console.log(`📊 Connected to spreadsheet: "${metadata.title}"`);
     
-    // Fetch headers
-    const headers = await fetchSheetData(auth, 'Mirror!A1:O1');
-    const headerRow = headers[0];
+    // Validate Mirror tab structure
+    console.log('\n📋 Validating Mirror tab (for approval status)...');
+    const mirrorHeaders = await fetchSheetData(auth, 'Mirror!A1:O1');
+    const mirrorHeaderRow = mirrorHeaders[0];
     
-    console.log('📋 Found headers:', headerRow);
-    console.log('');
+    console.log('📋 Mirror tab headers:', mirrorHeaderRow);
     
-    // Define required and optional columns
-    const requiredColumns = [
-      { name: 'timestamp', patterns: ['timestamp'] },
+    // Define required columns for Mirror tab
+    const mirrorRequiredColumns = [
+      { name: 'approved', patterns: ['approved'] },
+      { name: 'formResponseUrl', patterns: ['form response url'] }
+    ];
+    
+    const mirrorOptionalColumns = [
       { name: 'title', patterns: ['title'] },
-      { name: 'body', patterns: ['body'] },
-      { name: 'approved', patterns: ['approved'] }
+      { name: 'location', patterns: ['where', 'location'] }
     ];
     
-    const optionalColumns = [
-      { name: 'id', patterns: ['id'] },
-      { name: 'formResponseUrl', patterns: ['form response url'] },
-      { name: 'location', patterns: ['where'] },
-      { name: 'category', patterns: ['kind'] }
-    ];
+    // Check Mirror tab required columns
+    console.log('✅ Checking Mirror tab required columns:');
+    const mirrorMissingColumns = [];
     
-    // Check required columns
-    console.log('✅ Checking required columns:');
-    const missingColumns = [];
-    
-    for (const column of requiredColumns) {
-      const found = headerRow.some(header => 
+    for (const column of mirrorRequiredColumns) {
+      const found = mirrorHeaderRow.some(header => 
         column.patterns.some(pattern => 
           header.toLowerCase().includes(pattern)
         )
@@ -170,14 +174,68 @@ async function validateSpreadsheetStructure(auth) {
         console.log(`   ✅ ${column.name}`);
       } else {
         console.log(`   ❌ ${column.name} - MISSING`);
-        missingColumns.push(column.name);
+        mirrorMissingColumns.push(column.name);
       }
     }
     
-    // Check optional columns
-    console.log('\n📝 Checking optional columns:');
-    for (const column of optionalColumns) {
-      const found = headerRow.some(header => 
+    // Check Mirror tab optional columns
+    console.log('\n📝 Checking Mirror tab optional columns:');
+    for (const column of mirrorOptionalColumns) {
+      const found = mirrorHeaderRow.some(header => 
+        column.patterns.some(pattern => 
+          header.toLowerCase().includes(pattern)
+        )
+      );
+      
+      if (found) {
+        console.log(`   ✅ ${column.name}`);
+      } else {
+        console.log(`   ⚠️  ${column.name} - Optional, not found`);
+      }
+    }
+    
+    // Validate Form Responses 1 tab structure
+    console.log('\n📋 Validating Form Responses 1 tab (for content)...');
+    const formHeaders = await fetchSheetData(auth, 'Form Responses 1!A1:Z1');
+    const formHeaderRow = formHeaders[0];
+    
+    console.log('📋 Form Responses 1 tab headers:', formHeaderRow);
+    
+    // Define required columns for Form Responses 1 tab
+    const formRequiredColumns = [
+      { name: 'timestamp', patterns: ['timestamp'] },
+      { name: 'title', patterns: ['title'] },
+      { name: 'body', patterns: ['body', 'description', 'content'] }
+    ];
+    
+    const formOptionalColumns = [
+      { name: 'location', patterns: ['where', 'location'] },
+      { name: 'category', patterns: ['kind', 'category', 'type'] }
+    ];
+    
+    // Check Form Responses 1 tab required columns
+    console.log('✅ Checking Form Responses 1 tab required columns:');
+    const formMissingColumns = [];
+    
+    for (const column of formRequiredColumns) {
+      const found = formHeaderRow.some(header => 
+        column.patterns.some(pattern => 
+          header.toLowerCase().includes(pattern)
+        )
+      );
+      
+      if (found) {
+        console.log(`   ✅ ${column.name}`);
+      } else {
+        console.log(`   ❌ ${column.name} - MISSING`);
+        formMissingColumns.push(column.name);
+      }
+    }
+    
+    // Check Form Responses 1 tab optional columns
+    console.log('\n📝 Checking Form Responses 1 tab optional columns:');
+    for (const column of formOptionalColumns) {
+      const found = formHeaderRow.some(header => 
         column.patterns.some(pattern => 
           header.toLowerCase().includes(pattern)
         )
@@ -192,13 +250,22 @@ async function validateSpreadsheetStructure(auth) {
     
     // Summary
     console.log('\n📊 Summary:');
-    if (missingColumns.length === 0) {
-      console.log('✅ All required columns are present!');
+    const allMissingColumns = [...mirrorMissingColumns, ...formMissingColumns];
+    
+    if (allMissingColumns.length === 0) {
+      console.log('✅ All required columns are present in both tabs!');
       console.log('✅ Sheet structure is valid for the content management system.');
       return true;
     } else {
       console.log('❌ Missing required columns:');
-      missingColumns.forEach(col => console.log(`   - ${col}`));
+      if (mirrorMissingColumns.length > 0) {
+        console.log('   Mirror tab:');
+        mirrorMissingColumns.forEach(col => console.log(`     - ${col}`));
+      }
+      if (formMissingColumns.length > 0) {
+        console.log('   Form Responses 1 tab:');
+        formMissingColumns.forEach(col => console.log(`     - ${col}`));
+      }
       console.log('\nPlease add the missing columns to your Google Sheets.');
       return false;
     }
@@ -209,46 +276,33 @@ async function validateSpreadsheetStructure(auth) {
   }
 }
 
-function parseSheetData(rows) {
+function parseMirrorData(rows) {
   if (rows.length < 2) {
-    throw new ContentSyncError('Insufficient data in spreadsheet', 'INSUFFICIENT_DATA');
+    throw new ContentSyncError('Insufficient data in Mirror tab', 'INSUFFICIENT_DATA');
   }
   
   const headers = rows[0];
   const dataRows = rows.slice(1);
   
-  console.log('🔍 Debug: Found headers:', headers);
-  console.log('🔍 Debug: Header details:');
-  headers.forEach((header, index) => {
-    console.log(`   ${index}: "${header}"`);
-  });
+  console.log('🔍 Debug: Mirror tab headers:', headers);
   
-  // Updated column mapping with robust patterns
+  // Column mapping for Mirror tab
   const columnMap = {
-    timestamp: headers.findIndex(h => h.toLowerCase().includes('timestamp')),
-    title: headers.findIndex(h => h.toLowerCase().includes('title')),
-    body: headers.findIndex(h => h.toLowerCase().includes('body')),
     approved: headers.findIndex(h => h.toLowerCase().includes('approved')),
-    id: headers.findIndex(h => h.toLowerCase() === 'id'),
     formResponseUrl: headers.findIndex(h => h.toLowerCase().includes('form response url')),
+    title: headers.findIndex(h => h.toLowerCase().includes('title')),
     location: headers.findIndex(h => {
       const l = h.toLowerCase();
-      return l.includes('location') || l.includes('where are you seeking connections');
-    }),
-    category: headers.findIndex(h => {
-      const l = h.toLowerCase();
-      return l.includes('category') || l.includes('what kind of connections are you seeking?');
+      return l.includes('location') || l.includes('where');
     })
   };
   
-  // console.log('🔍 Debug: Column mapping:', columnMap);
-  
-  // Validate required columns
-  const requiredColumns = ['approved', 'title', 'body'];
+  // Validate required columns for Mirror tab
+  const requiredColumns = ['approved', 'formResponseUrl'];
   for (const col of requiredColumns) {
     if (columnMap[col] === -1) {
       throw new ContentSyncError(
-        `Missing required column: ${col}`,
+        `Missing required column in Mirror tab: ${col}`,
         'MISSING_COLUMN'
       );
     }
@@ -257,45 +311,167 @@ function parseSheetData(rows) {
   return { headers, dataRows, columnMap };
 }
 
-function validatePersonal(row, columnMap, rowIndex) {
-  const errors = [];
-
-  // console.log('🔍 Debug: Processing row:', row);
-  // console.log('🔍 Debug: Column map:', columnMap);
+function parseFormResponsesData(rows) {
+  if (rows.length < 2) {
+    throw new ContentSyncError('Insufficient data in Form Responses 1 tab', 'INSUFFICIENT_DATA');
+  }
   
-  // Check if approved
-  const approved = row[columnMap.approved]?.toString().toLowerCase().trim();
-  console.log(`🔍 Debug: Row ${rowIndex} approval status: "${approved}" (column index: ${columnMap.approved})`);
+  const headers = rows[0];
+  const dataRows = rows.slice(1);
+  
+  console.log('🔍 Debug: Form Responses 1 tab headers:', headers);
+  
+  // Column mapping for Form Responses 1 tab
+  const columnMap = {
+    timestamp: headers.findIndex(h => h.toLowerCase().includes('timestamp')),
+    title: headers.findIndex(h => h.toLowerCase().includes('title')),
+    body: headers.findIndex(h => {
+      const l = h.toLowerCase();
+      return l.includes('body') || l.includes('description') || l.includes('content');
+    }),
+    location: headers.findIndex(h => {
+      const l = h.toLowerCase();
+      return l.includes('location') || l.includes('where');
+    }),
+    category: headers.findIndex(h => {
+      const l = h.toLowerCase();
+      return l.includes('category') || l.includes('kind') || l.includes('type');
+    })
+  };
+  
+  // Validate required columns for Form Responses 1 tab
+  const requiredColumns = ['timestamp', 'title', 'body'];
+  for (const col of requiredColumns) {
+    if (columnMap[col] === -1) {
+      throw new ContentSyncError(
+        `Missing required column in Form Responses 1 tab: ${col}`,
+        'MISSING_COLUMN'
+      );
+    }
+  }
+  
+  return { headers, dataRows, columnMap };
+}
+
+function matchMirrorAndFormData(mirrorData, formData) {
+  console.log('🔍 Matching Mirror and Form Responses data...');
+  
+  const { dataRows: mirrorRows, columnMap: mirrorMap } = mirrorData;
+  const { dataRows: formRows, columnMap: formMap } = formData;
+  
+  // Create a map of form responses by Form Response URL
+  // We need to find the Form Response URL column in the form data
+  const formResponseUrlColumn = formRows[0]?.findIndex(h => 
+    h.toLowerCase().includes('form response url') || 
+    h.toLowerCase().includes('response url') ||
+    h.toLowerCase().includes('edit response')
+  );
+  
+  if (formResponseUrlColumn === -1) {
+    console.log('⚠️  Could not find Form Response URL column in Form Responses 1 tab');
+    console.log('📋 Available columns:', formRows[0]);
+    throw new ContentSyncError('Form Response URL column not found in Form Responses 1 tab', 'MISSING_COLUMN');
+  }
+  
+  console.log(`📋 Found Form Response URL column at index ${formResponseUrlColumn}: "${formRows[0][formResponseUrlColumn]}"`);
+  
+  const formMapByUrl = new Map();
+  formRows.slice(1).forEach((row, index) => {
+    const formResponseUrl = row[formResponseUrlColumn]?.toString().trim();
+    if (formResponseUrl) {
+      formMapByUrl.set(formResponseUrl, { row, index: index + 2 }); // +2 for 1-based indexing and header row
+    }
+  });
+  
+  console.log(`📊 Found ${formMapByUrl.size} form responses to match`);
+  
+  const matchedData = [];
+  const unmatchedMirror = [];
+  
+  mirrorRows.forEach((mirrorRow, mirrorIndex) => {
+    const mirrorFormResponseUrl = mirrorRow[mirrorMap.formResponseUrl]?.toString().trim();
+    const isApproved = mirrorRow[mirrorMap.approved]?.toString().toLowerCase().trim();
+    
+    console.log(`🔍 Debug: Mirror row ${mirrorIndex + 2} - Form URL: "${mirrorFormResponseUrl}", Approved: "${isApproved}"`);
+    
+    if (!mirrorFormResponseUrl) {
+      console.log(`⚠️  Mirror row ${mirrorIndex + 2} has no Form Response URL`);
+      unmatchedMirror.push({ row: mirrorRow, index: mirrorIndex + 2, reason: 'No Form Response URL' });
+      return;
+    }
+    
+    const formMatch = formMapByUrl.get(mirrorFormResponseUrl);
+    if (!formMatch) {
+      console.log(`⚠️  No form response found for Mirror row ${mirrorIndex + 2} with URL: ${mirrorFormResponseUrl}`);
+      unmatchedMirror.push({ row: mirrorRow, index: mirrorIndex + 2, reason: 'No matching form response' });
+      return;
+    }
+    
+    // Check if approved
+    if (isApproved !== 'yes' && isApproved !== 'true' && isApproved !== '1') {
+      console.log(`🔍 Debug: Mirror row ${mirrorIndex + 2} not approved (${isApproved})`);
+      return; // Skip unapproved entries
+    }
+    
+    console.log(`✅ Matched Mirror row ${mirrorIndex + 2} with Form row ${formMatch.index}`);
+    
+    // Combine the data
+    const combinedData = {
+      mirrorRow,
+      formRow: formMatch.row,
+      mirrorIndex: mirrorIndex + 2,
+      formIndex: formMatch.index,
+      mirrorMap,
+      formMap
+    };
+    
+    matchedData.push(combinedData);
+  });
+  
+  console.log(`📊 Successfully matched ${matchedData.length} approved entries`);
+  if (unmatchedMirror.length > 0) {
+    console.log(`⚠️  ${unmatchedMirror.length} mirror entries could not be matched:`);
+    unmatchedMirror.forEach(item => {
+      console.log(`   - Row ${item.index}: ${item.reason}`);
+    });
+  }
+  
+  return matchedData;
+}
+
+function validatePersonal(combinedData) {
+  const errors = [];
+  const { mirrorRow, formRow, mirrorIndex, formIndex, mirrorMap, formMap } = combinedData;
+
+  // Approval status is already checked in matchMirrorAndFormData, but double-check
+  const approved = mirrorRow[mirrorMap.approved]?.toString().toLowerCase().trim();
   if (approved !== 'yes' && approved !== 'true' && approved !== '1') {
-    console.log(`🔍 Debug: Row ${rowIndex} rejected - not approved`);
     return { valid: false, reason: 'Not approved' };
   }
-  console.log(`🔍 Debug: Row ${rowIndex} approved`);
   
-  // Validate required fields
-  const title = row[columnMap.title]?.toString().trim();
-  const body = row[columnMap.body]?.toString().trim();
+  // Validate required fields from form data
+  const title = formRow[formMap.title]?.toString().trim();
+  const body = formRow[formMap.body]?.toString().trim();
   
   if (!title) {
-    errors.push('Title missing');
+    errors.push('Title missing from form data');
   }
   
   if (!body) {
-    errors.push('Body missing');
+    errors.push('Body missing from form data');
   }
   
-  // Validate Form Response URL is present
-  const formResponseUrl = row[columnMap.formResponseUrl]?.toString().trim();
+  // Validate Form Response URL is present in mirror data
+  const formResponseUrl = mirrorRow[mirrorMap.formResponseUrl]?.toString().trim();
   if (!formResponseUrl) {
     errors.push('Form Response URL is required');
   }
 
-  // Extract location and category with debug info
-  const location = row[columnMap.location]?.toString().trim();
-  const category = row[columnMap.category]?.toString().trim();
+  // Extract location and category from form data
+  const location = formRow[formMap.location]?.toString().trim();
+  const category = formRow[formMap.category]?.toString().trim();
   
-  console.log('🔍 Debug: Extracted location:', location, '(column index:', columnMap.location, ')');
-  console.log('🔍 Debug: Extracted category:', category, '(column index:', columnMap.category, ')');
+  console.log(`🔍 Debug: Form row ${formIndex} - Title: "${title}", Location: "${location}", Category: "${category}"`);
 
   return {
     valid: errors.length === 0,
@@ -303,8 +479,7 @@ function validatePersonal(row, columnMap, rowIndex) {
     data: {
       title,
       body,
-      timestamp: row[columnMap.timestamp]?.toString().trim(),
-      id: row[columnMap.id]?.toString().trim(),
+      timestamp: formRow[formMap.timestamp]?.toString().trim(),
       formResponseUrl,
       location,
       category
@@ -312,25 +487,25 @@ function validatePersonal(row, columnMap, rowIndex) {
   };
 }
 
-function processPersonals(dataRows, columnMap) {
+function processPersonals(matchedData) {
   const processed = [];
   const errors = [];
   
-  dataRows.forEach((row, index) => {
+  matchedData.forEach((combinedData, index) => {
     try {
-      const validation = validatePersonal(row, columnMap, index + 2);
+      const validation = validatePersonal(combinedData);
       
       if (!validation.valid) {
         if (validation.reason !== 'Not approved') {
-          errors.push(`Row ${index + 2}: ${validation.errors.join(', ')}`);
+          errors.push(`Mirror row ${combinedData.mirrorIndex}/Form row ${combinedData.formIndex}: ${validation.errors.join(', ')}`);
         }
         return;
       }
       
       const data = validation.data;
       
-      // Use ID from the "ID" column if present, otherwise auto-generate
-      const id = data.id || `personal-${Date.now()}-${index}`;
+      // Generate ID based on timestamp and index
+      const id = `personal-${Date.now()}-${index}`;
       
       // Parse date from timestamp
       let datePosted = new Date().toISOString().split('T')[0];
@@ -341,7 +516,7 @@ function processPersonals(dataRows, columnMap) {
             datePosted = timestamp.toISOString().split('T')[0];
           }
         } catch (e) {
-          console.warn(`Invalid timestamp in row ${index + 2}: ${data.timestamp}`);
+          console.warn(`Invalid timestamp in form row ${combinedData.formIndex}: ${data.timestamp}`);
         }
       }
       
@@ -358,7 +533,7 @@ function processPersonals(dataRows, columnMap) {
       processed.push(personal);
       
     } catch (error) {
-      errors.push(`Row ${index + 2}: ${error.message}`);
+      errors.push(`Mirror row ${combinedData.mirrorIndex}/Form row ${combinedData.formIndex}: ${error.message}`);
     }
   });
   
@@ -557,30 +732,51 @@ async function main(testMode = false) {
       console.log('');
     }
     
-    // Fetch data
+    // Fetch data from both tabs
     if (testMode) {
-      console.log('📥 Testing data fetching...');
+      console.log('📥 Testing data fetching from both tabs...');
     } else {
       console.log('📥 Fetching data from Google Sheets...');
     }
-    const rows = await fetchSheetData(auth);
-    console.log(`📊 ${testMode ? 'Successfully fetched' : 'Fetched'} ${rows.length} rows from spreadsheet`);
+    
+    // Fetch Mirror tab data (for approval status)
+    const mirrorRows = await fetchMirrorData(auth);
+    console.log(`📊 ${testMode ? 'Successfully fetched' : 'Fetched'} ${mirrorRows.length} rows from Mirror tab`);
+    
+    // Fetch Form Responses 1 tab data (for content)
+    const formRows = await fetchFormResponsesData(auth);
+    console.log(`📊 ${testMode ? 'Successfully fetched' : 'Fetched'} ${formRows.length} rows from Form Responses 1 tab`);
     
     if (testMode) {
       console.log('');
     }
     
-    // Parse and validate data
+    // Parse data from both tabs
     if (testMode) {
       console.log('🔍 Testing data parsing...');
     } else {
-      console.log('🔍 Parsing and validating data...');
+      console.log('🔍 Parsing data from both tabs...');
     }
-    const { dataRows, columnMap } = parseSheetData(rows);
+    
+    const mirrorData = parseMirrorData(mirrorRows);
+    const formData = parseFormResponsesData(formRows);
     
     if (testMode) {
-      console.log(`📋 Found ${dataRows.length} data rows`);
-      console.log('📋 Column mapping:', columnMap);
+      console.log(`📋 Found ${mirrorData.dataRows.length} Mirror tab data rows`);
+      console.log(`📋 Found ${formData.dataRows.length} Form Responses 1 tab data rows`);
+      console.log('');
+    }
+    
+    // Match data between tabs
+    if (testMode) {
+      console.log('🔍 Testing data matching...');
+    } else {
+      console.log('🔍 Matching data between tabs...');
+    }
+    const matchedData = matchMirrorAndFormData(mirrorData, formData);
+    
+    if (testMode) {
+      console.log(`📊 Successfully matched ${matchedData.length} entries`);
       console.log('');
     }
     
@@ -590,7 +786,7 @@ async function main(testMode = false) {
     } else {
       console.log('⚙️  Processing personals...');
     }
-    const newPersonals = processPersonals(dataRows, columnMap);
+    const newPersonals = processPersonals(matchedData);
     console.log(`✅ ${testMode ? 'Successfully processed' : 'Processed'} ${newPersonals.length} valid personals`);
     
     if (testMode) {
@@ -638,7 +834,9 @@ async function main(testMode = false) {
 
 // Export functions for testing
 export { 
-  parseSheetData, 
+  parseMirrorData,
+  parseFormResponsesData,
+  matchMirrorAndFormData,
   processPersonals, 
   validatePersonal, 
   normalizeLocation, 
@@ -646,6 +844,8 @@ export {
   parseLocations,
   validateSpreadsheetStructure,
   fetchSheetData,
+  fetchMirrorData,
+  fetchFormResponsesData,
   loadCredentials
 };
 
