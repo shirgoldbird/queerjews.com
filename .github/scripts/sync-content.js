@@ -151,11 +151,11 @@ async function validateSpreadsheetStructure(auth) {
     // Define required columns for Mirror tab
     const mirrorRequiredColumns = [
       { name: 'approved', patterns: ['approved'] },
-      { name: 'formResponseUrl', patterns: ['form response url'] }
+      { name: 'title', patterns: ['title'] }
     ];
     
     const mirrorOptionalColumns = [
-      { name: 'title', patterns: ['title'] },
+      { name: 'formResponseUrl', patterns: ['form response url'] },
       { name: 'location', patterns: ['where', 'location'] }
     ];
     
@@ -289,8 +289,8 @@ function parseMirrorData(rows) {
   // Column mapping for Mirror tab
   const columnMap = {
     approved: headers.findIndex(h => h.toLowerCase().includes('approved')),
-    formResponseUrl: headers.findIndex(h => h.toLowerCase().includes('form response url')),
     title: headers.findIndex(h => h.toLowerCase().includes('title')),
+    formResponseUrl: headers.findIndex(h => h.toLowerCase().includes('form response url')),
     location: headers.findIndex(h => {
       const l = h.toLowerCase();
       return l.includes('location') || l.includes('where');
@@ -298,7 +298,7 @@ function parseMirrorData(rows) {
   };
   
   // Validate required columns for Mirror tab
-  const requiredColumns = ['approved', 'formResponseUrl'];
+  const requiredColumns = ['approved', 'title'];
   for (const col of requiredColumns) {
     if (columnMap[col] === -1) {
       throw new ContentSyncError(
@@ -320,6 +320,8 @@ function parseFormResponsesData(rows) {
   const dataRows = rows.slice(1);
   
   console.log('🔍 Debug: Form Responses 1 tab headers:', headers);
+  console.log('🔍 Debug: Form Responses 1 tab total rows:', rows.length);
+  console.log('🔍 Debug: Form Responses 1 tab data rows:', dataRows.length);
   
   // Column mapping for Form Responses 1 tab
   const columnMap = {
@@ -359,51 +361,51 @@ function matchMirrorAndFormData(mirrorData, formData) {
   const { dataRows: mirrorRows, columnMap: mirrorMap } = mirrorData;
   const { dataRows: formRows, columnMap: formMap } = formData;
   
-  // Create a map of form responses by Form Response URL
-  // We need to find the Form Response URL column in the form data
-  const formResponseUrlColumn = formRows[0]?.findIndex(h => 
-    h.toLowerCase().includes('form response url') || 
-    h.toLowerCase().includes('response url') ||
-    h.toLowerCase().includes('edit response')
-  );
+  console.log(`🔍 Debug: formRows length: ${formRows.length}`);
+  console.log(`🔍 Debug: formRows.slice(1) length: ${formRows.slice(1).length}`);
   
-  if (formResponseUrlColumn === -1) {
-    console.log('⚠️  Could not find Form Response URL column in Form Responses 1 tab');
-    console.log('📋 Available columns:', formRows[0]);
-    throw new ContentSyncError('Form Response URL column not found in Form Responses 1 tab', 'MISSING_COLUMN');
-  }
+  // Since the Mirror tab has the Form Response URL and the Form Responses 1 tab has the content,
+  // we need to match by a common identifier. Let's use the title as the primary matching key.
+  // The Mirror tab should have the title from the form response.
   
-  console.log(`📋 Found Form Response URL column at index ${formResponseUrlColumn}: "${formRows[0][formResponseUrlColumn]}"`);
-  
-  const formMapByUrl = new Map();
+  // Create a map of form responses by title (case-insensitive)
+  const formMapByTitle = new Map();
+  console.log(`🔍 Debug: Processing ${formRows.length - 1} form data rows (excluding header)`);
   formRows.slice(1).forEach((row, index) => {
-    const formResponseUrl = row[formResponseUrlColumn]?.toString().trim();
-    if (formResponseUrl) {
-      formMapByUrl.set(formResponseUrl, { row, index: index + 2 }); // +2 for 1-based indexing and header row
+    console.log(`🔍 Debug: Form row ${index + 2} full data:`, row);
+    const title = row[formMap.title]?.toString().trim();
+    console.log(`🔍 Debug: Form row ${index + 2}, title column ${formMap.title}: "${title}"`);
+    if (title) {
+      const titleKey = title.toLowerCase();
+      formMapByTitle.set(titleKey, { row, index: index + 2 }); // +2 for 1-based indexing and header row
+      console.log(`🔍 Debug: Added form title "${title}" (key: "${titleKey}")`);
+    } else {
+      console.log(`🔍 Debug: No title found in form row ${index + 2}`);
     }
   });
   
-  console.log(`📊 Found ${formMapByUrl.size} form responses to match`);
+  console.log(`📊 Found ${formMapByTitle.size} form responses to match by title`);
   
   const matchedData = [];
   const unmatchedMirror = [];
   
   mirrorRows.forEach((mirrorRow, mirrorIndex) => {
-    const mirrorFormResponseUrl = mirrorRow[mirrorMap.formResponseUrl]?.toString().trim();
+    const mirrorTitle = mirrorRow[mirrorMap.title]?.toString().trim();
     const isApproved = mirrorRow[mirrorMap.approved]?.toString().toLowerCase().trim();
     
-    console.log(`🔍 Debug: Mirror row ${mirrorIndex + 2} - Form URL: "${mirrorFormResponseUrl}", Approved: "${isApproved}"`);
+    console.log(`🔍 Debug: Mirror row ${mirrorIndex + 2} - Title: "${mirrorTitle}", Approved: "${isApproved}"`);
     
-    if (!mirrorFormResponseUrl) {
-      console.log(`⚠️  Mirror row ${mirrorIndex + 2} has no Form Response URL`);
-      unmatchedMirror.push({ row: mirrorRow, index: mirrorIndex + 2, reason: 'No Form Response URL' });
+    if (!mirrorTitle) {
+      console.log(`⚠️  Mirror row ${mirrorIndex + 2} has no title`);
+      unmatchedMirror.push({ row: mirrorRow, index: mirrorIndex + 2, reason: 'No title' });
       return;
     }
     
-    const formMatch = formMapByUrl.get(mirrorFormResponseUrl);
+    const titleKey = mirrorTitle.toLowerCase();
+    const formMatch = formMapByTitle.get(titleKey);
     if (!formMatch) {
-      console.log(`⚠️  No form response found for Mirror row ${mirrorIndex + 2} with URL: ${mirrorFormResponseUrl}`);
-      unmatchedMirror.push({ row: mirrorRow, index: mirrorIndex + 2, reason: 'No matching form response' });
+      console.log(`⚠️  No form response found for Mirror row ${mirrorIndex + 2} with title: ${mirrorTitle}`);
+      unmatchedMirror.push({ row: mirrorRow, index: mirrorIndex + 2, reason: 'No matching form response by title' });
       return;
     }
     
@@ -413,7 +415,7 @@ function matchMirrorAndFormData(mirrorData, formData) {
       return; // Skip unapproved entries
     }
     
-    console.log(`✅ Matched Mirror row ${mirrorIndex + 2} with Form row ${formMatch.index}`);
+    console.log(`✅ Matched Mirror row ${mirrorIndex + 2} with Form row ${formMatch.index} by title: "${mirrorTitle}"`);
     
     // Combine the data
     const combinedData = {
