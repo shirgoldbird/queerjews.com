@@ -44,7 +44,48 @@ export default function PersonalsGrid({ personals }) {
     }
     return [];
   });
-  const uniqueLocations = [...new Set(allLocations)].sort();
+  
+  // Custom sort order for locations - popular locations first, then alphabetical
+  const locationSortOrder = [
+    'New York City',
+    'Washington DC',
+    'Seattle',
+    'Portland',
+    'Israel',
+    'Diaspora',
+    'Online'
+  ];
+  
+  const uniqueLocations = [...new Set(allLocations)].sort((a, b) => {
+    const aIndex = locationSortOrder.indexOf(a);
+    const bIndex = locationSortOrder.indexOf(b);
+    
+    // If both locations are in the sort order, sort by their position
+    if (aIndex !== -1 && bIndex !== -1) {
+      return aIndex - bIndex;
+    }
+    
+    // If only one location is in the sort order
+    if (aIndex !== -1) {
+      // If b is one of the broad categories (Israel, Diaspora, Online), a comes first
+      if (['Israel', 'Diaspora', 'Online'].includes(b)) {
+        return -1;
+      }
+      // Otherwise, a (in sort order) comes before b (not in sort order)
+      return -1;
+    }
+    if (bIndex !== -1) {
+      // If a is one of the broad categories (Israel, Diaspora, Online), b comes first
+      if (['Israel', 'Diaspora', 'Online'].includes(a)) {
+        return 1;
+      }
+      // Otherwise, b (in sort order) comes before a (not in sort order)
+      return 1;
+    }
+    
+    // If neither location is in the sort order, sort alphabetically
+    return a.localeCompare(b);
+  });
   
   // Get unique categories from the data
   const allCategories = personals.flatMap(p => 
