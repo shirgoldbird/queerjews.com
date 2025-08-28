@@ -153,19 +153,22 @@ const bylineClass = isDetail
         const originalText = button.innerHTML;
         const originalClasses = button.className;
         
-        // Try native share API first (mobile devices)
-        if (navigator.share) {
+        // Check if we're on mobile (has touch screen and native share API)
+        const isMobile = 'ontouchstart' in window && navigator.share;
+        
+        if (isMobile) {
+          // Use native share API on mobile devices
           navigator.share({
             title: 'Queer Jews Personal',
             text: 'Check out this personal ad on Queer Jews',
             url: url
           }).catch((error) => {
             console.log('Share cancelled or failed:', error);
-            // Fall back to clipboard copy
+            // If user cancels or share fails, fall back to clipboard copy
             copyToClipboard();
           });
         } else {
-          // Desktop fallback: copy to clipboard
+          // On desktop: copy to clipboard
           copyToClipboard();
         }
         
