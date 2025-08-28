@@ -475,9 +475,15 @@ function validatePersonal(combinedData) {
   };
 }
 
-function processPersonals(matchedData) {
+function processPersonals(matchedData, existingPersonals = []) {
   const processed = [];
   const errors = [];
+  
+  // Create a map of existing personals by title for ID preservation
+  const existingByTitle = new Map();
+  existingPersonals.forEach(personal => {
+    existingByTitle.set(personal.title, personal);
+  });
   
   matchedData.forEach((combinedData, index) => {
     try {
@@ -492,8 +498,38 @@ function processPersonals(matchedData) {
       
       const data = validation.data;
       
-      // Generate ID based on timestamp and index
-      const id = `personal-${Date.now()}-${index}`;
+      // Check if this personal already exists by title
+      const existingPersonal = existingByTitle.get(data.title);
+      let id;
+      
+      if (existingPersonal) {
+        // Preserve the existing ID
+        id = existingPersonal.id;
+        console.log(`🔄 Preserving existing ID for "${data.title}": ${id}`);
+      } else {
+        // Generate new stable ID based on original submission timestamp
+        if (data.timestamp) {
+          try {
+            const timestamp = new Date(data.timestamp);
+            if (!isNaN(timestamp.getTime())) {
+              // Use the original submission timestamp for stable ID
+              const timestampMs = timestamp.getTime();
+              id = `personal-${timestampMs}-${combinedData.formIndex}`;
+            } else {
+              // Fallback: use current time but with form index for uniqueness
+              id = `personal-${Date.now()}-${combinedData.formIndex}`;
+            }
+          } catch (e) {
+            console.warn(`Invalid timestamp in form row ${combinedData.formIndex}: ${data.timestamp}`);
+            // Fallback: use current time but with form index for uniqueness
+            id = `personal-${Date.now()}-${combinedData.formIndex}`;
+          }
+        } else {
+          // No timestamp available, use current time with form index
+          id = `personal-${Date.now()}-${combinedData.formIndex}`;
+        }
+        console.log(`🆕 Generated new ID for "${data.title}": ${id}`);
+      }
       
       // Parse date from timestamp
       let datePosted = new Date().toISOString().split('T')[0];
@@ -768,13 +804,18 @@ async function main(testMode = false) {
       console.log('');
     }
     
+    // Load existing personals first (for ID preservation)
+    console.log('🔄 Loading existing personals...');
+    const existingPersonals = await loadExistingPersonals();
+    console.log(`📊 Found ${existingPersonals.length} existing personals`);
+    
     // Process personals
     if (testMode) {
       console.log('⚙️  Testing personal processing...');
     } else {
       console.log('⚙️  Processing personals...');
     }
-    const newPersonals = processPersonals(matchedData);
+    const newPersonals = processPersonals(matchedData, existingPersonals);
     console.log(`✅ ${testMode ? 'Successfully processed' : 'Processed'} ${newPersonals.length} valid personals`);
     
     if (testMode) {
@@ -798,12 +839,7 @@ async function main(testMode = false) {
       return;
     }
     
-    // Load existing personals and merge (production mode only)
-    console.log('🔄 Loading existing personals...');
-    const existingPersonals = await loadExistingPersonals();
-    console.log(`📊 Found ${existingPersonals.length} existing personals`);
-    
-    // Merge and handle removals
+    // Merge and handle removals (production mode only)
     console.log('🔄 Merging personals...');
     const finalPersonals = await mergePersonals(newPersonals, existingPersonals);
     

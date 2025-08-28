@@ -5,6 +5,8 @@ A community-oriented personals website for queer Jewish people to connect, build
 ## Features
 
 - **Browse Personals**: View and search through personal ads with filtering options
+- **Deep Linking**: Share direct links to specific personals with highlighting
+- **Individual Pages**: Each personal has its own dedicated page with sharing functionality
 - **Submit Ads**: Submit your own personal ad through Google Forms
 - **Content Management**: Automated pipeline that syncs approved submissions from Google Sheets
 - **Mobile-First Design**: Responsive design that works on all devices
@@ -83,6 +85,50 @@ npm run test-real
 
 # Run sync manually, updating personals.json
 npm run sync
+
+# Test deep linking functionality
+node scripts/test-deep-linking.js
+
+## Deep Linking
+
+The site supports deep linking to specific personals in two ways:
+
+### 1. URL Parameters
+Add `?personal=<id>` to the main page URL to highlight and scroll to a specific personal:
+```
+https://queerjews.com/?personal=personal-1755990470542-0
+```
+
+### 2. Individual Pages
+Each personal has its own dedicated page at `/personal/<id>` (without the "personal-" prefix):
+```
+https://queerjews.com/personal/1755990470542-0
+```
+
+### Features
+- **Highlighting**: Deep-linked personals are highlighted with a blue border and animation
+- **Smooth Scrolling**: The page automatically scrolls to the highlighted personal
+- **Share Functionality**: Individual pages include a "Share Link" button that copies the URL to clipboard
+- **SEO Friendly**: Each personal page has its own title and meta tags
+
+### Testing
+Run the deep linking test to verify functionality:
+```bash
+node scripts/test-deep-linking.js
+```
+
+### ID Stability
+Personal IDs are designed to remain stable across sync operations:
+
+- **Format**: `personal-<timestamp>-<index>`
+- **Timestamp**: Based on original Google Form submission time
+- **Index**: Form response row number for uniqueness
+- **Preservation**: Existing personals keep their IDs when updated
+- **Fallback**: If no timestamp available, uses current time + index
+
+Test ID stability:
+```bash
+node scripts/test-id-stability.js
 ```
 
 ## Deployment

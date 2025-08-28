@@ -58,8 +58,28 @@ function processSpecificRow(mirrorRow, formRow, mirrorMap, formMap, mirrorIndex,
     
     const data = validation.data;
     
-    // Generate ID
-    const id = `personal-${Date.now()}-${mirrorIndex}`;
+    // Generate stable ID based on original submission timestamp
+    let id;
+    if (data.timestamp) {
+      try {
+        const timestamp = new Date(data.timestamp);
+        if (!isNaN(timestamp.getTime())) {
+          // Use the original submission timestamp for stable ID
+          const timestampMs = timestamp.getTime();
+          id = `personal-${timestampMs}-${mirrorIndex}`;
+        } else {
+          // Fallback: use current time but with mirror index for uniqueness
+          id = `personal-${Date.now()}-${mirrorIndex}`;
+        }
+      } catch (e) {
+        console.warn(`Invalid timestamp in form row ${formIndex}: ${data.timestamp}`);
+        // Fallback: use current time but with mirror index for uniqueness
+        id = `personal-${Date.now()}-${mirrorIndex}`;
+      }
+    } else {
+      // No timestamp available, use current time with mirror index
+      id = `personal-${Date.now()}-${mirrorIndex}`;
+    }
     
     // Parse date from timestamp
     let datePosted = new Date().toISOString().split('T')[0];

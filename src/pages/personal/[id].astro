@@ -1,0 +1,56 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import PersonalCard from '../../components/PersonalCard.astro';
+import personals from '../../data/personals.json';
+
+export async function getStaticPaths() {
+  return personals.map((personal) => ({
+    params: { id: personal.id.replace('personal-', '') },
+    props: { personal },
+  }));
+}
+
+const { personal } = Astro.props;
+
+function getHeadline(personal: any) {
+  if (personal.title) return personal.title;
+  const words = personal.personal.split(' ');
+  return words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
+}
+---
+
+<Layout title={`${getHeadline(personal)} | Queer Jews`}>
+  <Header />
+  
+  <main class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="w-full xl:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-4">
+      <!-- Back to all personals -->
+      <div class="mb-8">
+        <a 
+          href={`/?personal=${personal.id}`}
+          class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to all personals
+        </a>
+      </div>
+
+      <!-- Personal Card -->
+      <div class="max-w-3xl mx-auto">
+        <PersonalCard 
+          personal={personal} 
+          variant="detail" 
+          showLinkIcon={false}
+          showRespondButton={true}
+          showShareButton={true}
+        />
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout> 

@@ -7,6 +7,9 @@ import personals from '../data/personals.json';
 
 // Sort by date (newest first)
 personals.sort((a, b) => new Date(b.date_posted).getTime() - new Date(a.date_posted).getTime());
+
+// Get personal ID from URL parameter for deep linking
+const personalId = Astro.url.searchParams.get('personal');
 ---
 
 <Layout title="Queer Jews | Find Your People!">

@@ -1,0 +1,100 @@
+---
+// No props needed for this component
+---
+
+<button
+  id="jump-to-top"
+  class="fixed left-3 bottom-3 md:left-8 md:bottom-8 z-50 bg-gray-800/70 dark:bg-gray-200/70 text-white dark:text-gray-800 hover:bg-gray-700/80 dark:hover:bg-gray-300/80 transition-all duration-200 rounded-full p-2 md:p-3 shadow-lg opacity-0 pointer-events-none transform translate-y-4 backdrop-blur-sm"
+  aria-label="Jump to top"
+  title="Jump to top"
+>
+  <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+  </svg>
+</button>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const jumpToTopButton = document.getElementById('jump-to-top');
+    if (!jumpToTopButton) return;
+
+    // Show/hide button based on scroll position
+    function toggleJumpToTop() {
+      if (!jumpToTopButton) return;
+      
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const isVisible = scrollTop > 300;
+      
+      if (isVisible) {
+        jumpToTopButton.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+        jumpToTopButton.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+      } else {
+        jumpToTopButton.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+        jumpToTopButton.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+      }
+    }
+
+    // Handle click - scroll to top and remove all query parameters
+    jumpToTopButton.addEventListener('click', function() {
+      // Remove all query parameters from URL
+      const url = new URL(window.location.href);
+      url.search = '';
+      
+      // Update URL without adding to browser history
+      window.history.replaceState({}, '', url.toString());
+      
+      // Smooth scroll to top
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    // Listen for scroll events
+    window.addEventListener('scroll', toggleJumpToTop);
+    
+    // Initial check
+    toggleJumpToTop();
+  });
+</script>
+
+<style>
+  /* Mobile-specific adjustments */
+  @media (max-width: 768px) {
+    #jump-to-top {
+      left: 0.75rem;
+      bottom: 0.75rem;
+      padding: 0.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    #jump-to-top svg {
+      width: 1rem;
+      height: 1rem;
+    }
+    
+    /* Make it even more subtle on very small screens */
+    @media (max-width: 480px) {
+      #jump-to-top {
+        left: 0.5rem;
+        bottom: 0.5rem;
+        padding: 0.375rem;
+      }
+      
+      #jump-to-top svg {
+        width: 0.875rem;
+        height: 0.875rem;
+      }
+    }
+  }
+  
+  /* Ensure button is above other content */
+  #jump-to-top {
+    z-index: 9999;
+  }
+  
+  /* Smooth transitions */
+  #jump-to-top {
+    transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.2s ease;
+  }
+</style> 

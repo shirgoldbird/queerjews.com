@@ -12,6 +12,9 @@
     "test-real": "node scripts/test-real-sync.js",
     "test-specific-row": "node scripts/test-specific-row.js",
     "validate-sheet": "node scripts/validate-sheet-structure.js",
+    "test-id-stability": "node scripts/test-id-stability.js",
+    "test-deep-linking": "node scripts/test-deep-linking.js",
+    "test": "npm run validate-sheet && npm run test-sync && npm run test-specific-row && npm run test-id-stability && npm run test-deep-linking",
     "sync": "node .github/scripts/sync-content.js"
   },
   "dependencies": {

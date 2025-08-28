@@ -1,17 +1,38 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
+import PersonalCard from './PersonalCard.jsx';
 
-function formatDate(dateStr) {
-  // Parse date as local date to avoid timezone issues
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const date = new Date(year, month - 1, day); // month is 0-indexed
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+// Function to get URL parameters
+function getUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
 }
 
-function getHeadline(personal) {
-  if (personal.title) return personal.title;
-  const words = personal.personal.split(' ');
-  return words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
+// Function to update URL without query parameters (except personal for deep linking)
+function updateUrlWithoutQueryParams() {
+  const personalId = getUrlParameter('personal');
+  const newUrl = personalId ? `/?personal=${personalId}` : '/';
+  
+  // Only update URL if it's different from current
+  if (window.location.pathname + window.location.search !== newUrl) {
+    window.history.replaceState({}, '', newUrl);
+  }
+}
+
+// Function to scroll to element with smooth animation
+function scrollToElement(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'center' 
+    });
+    // Add highlight effect
+    element.classList.add('highlight-personal');
+    setTimeout(() => {
+      element.classList.remove('highlight-personal');
+    }, 3000);
+  }
 }
 
 export default function PersonalsGrid({ personals }) {
@@ -21,6 +42,7 @@ export default function PersonalsGrid({ personals }) {
   const [location, setLocation] = useState('');
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [locationMessageDismissed, setLocationMessageDismissed] = useState(false);
+  const [highlightedPersonal, setHighlightedPersonal] = useState(null);
 
   // Check if location message was previously dismissed
   useEffect(() => {
@@ -29,6 +51,23 @@ export default function PersonalsGrid({ personals }) {
       setLocationMessageDismissed(true);
     }
   }, []);
+
+  // Handle deep linking to specific personal
+  useEffect(() => {
+    const personalId = getUrlParameter('personal');
+    if (personalId) {
+      setHighlightedPersonal(personalId);
+      // Scroll to the personal after a short delay to ensure DOM is ready
+      setTimeout(() => {
+        scrollToElement(personalId);
+      }, 100);
+    }
+  }, []);
+
+  // Update URL when filters change (remove query params except personal)
+  useEffect(() => {
+    updateUrlWithoutQueryParams();
+  }, [search, sort, category, location]);
 
   const dismissLocationMessage = () => {
     setLocationMessageDismissed(true);
@@ -230,45 +269,17 @@ export default function PersonalsGrid({ personals }) {
           <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">No personals found.</div>
         )}
         {filtered.map(personal => {
-          const headline = getHeadline(personal);
-          // Handle both new location arrays and legacy single location
-          const locationText = Array.isArray(personal.locations) 
-            ? personal.locations.join(', ').toUpperCase()
-            : (personal.location ? personal.location.toUpperCase() : null);
-          const byline = [locationText, formatDate(personal.date_posted)].filter(Boolean).join(' • ');
+          const isHighlighted = highlightedPersonal === personal.id;
+          
           return (
-            <article class="personal-card" key={personal.id}>
-              <div class="flex items-center justify-between mb-2">
-                <span class="text-xs text-gray-700 dark:text-gray-300 tracking-wide uppercase font-mono">{byline}</span>
-              </div>
-              <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
-                {headline}
-              </h2>
-              <p class="text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap font-sans" style="font-family: 'Inter', system-ui, sans-serif;">
-                {personal.personal}
-              </p>
-              <div class="personal-bottom-row">
-                <div class="flex flex-wrap gap-2">
-                  {Array.isArray(personal.categories)
-                    ? personal.categories.map((cat) => (
-                        <span class="personal-tag" key={cat}>{cat}</span>
-                      ))
-                    : personal.category && <span class="personal-tag">{personal.category}</span>
-                  }
-                </div>
-                <a
-                  href={personal.contact}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="personal-respond"
-                >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  Respond
-                </a>
-              </div>
-            </article>
+            <PersonalCard
+              key={personal.id}
+              personal={personal}
+              variant="grid"
+              showLinkIcon={true}
+              showRespondButton={true}
+              isHighlighted={isHighlighted}
+            />
           );
         })}
       </div>
