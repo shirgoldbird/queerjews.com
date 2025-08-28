@@ -8,6 +8,17 @@ function getUrlParameter(name) {
   return urlParams.get(name);
 }
 
+// Function to update URL without query parameters (except personal for deep linking)
+function updateUrlWithoutQueryParams() {
+  const personalId = getUrlParameter('personal');
+  const newUrl = personalId ? `/?personal=${personalId}` : '/';
+  
+  // Only update URL if it's different from current
+  if (window.location.pathname + window.location.search !== newUrl) {
+    window.history.replaceState({}, '', newUrl);
+  }
+}
+
 // Function to scroll to element with smooth animation
 function scrollToElement(elementId) {
   const element = document.getElementById(elementId);
@@ -52,6 +63,11 @@ export default function PersonalsGrid({ personals }) {
       }, 100);
     }
   }, []);
+
+  // Update URL when filters change (remove query params except personal)
+  useEffect(() => {
+    updateUrlWithoutQueryParams();
+  }, [search, sort, category, location]);
 
   const dismissLocationMessage = () => {
     setLocationMessageDismissed(true);
