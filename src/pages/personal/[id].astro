@@ -1,0 +1,204 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import personals from '../../data/personals.json';
+
+export async function getStaticPaths() {
+  return personals.map((personal) => ({
+    params: { id: personal.id.replace('personal-', '') },
+    props: { personal },
+  }));
+}
+
+const { personal } = Astro.props;
+
+function formatDate(dateStr: string) {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function getHeadline(personal: any) {
+  if (personal.title) return personal.title;
+  const words = personal.personal.split(' ');
+  return words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
+}
+
+const locationText = personal.locations.join(', ').toUpperCase();
+const byline = [locationText, formatDate(personal.date_posted)].filter(Boolean).join(' • ');
+---
+
+<Layout title={`${getHeadline(personal)} | Queer Jews`}>
+  <Header />
+  
+  <main class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <div class="w-full xl:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-4">
+      <!-- Back to all personals -->
+      <div class="mb-8">
+        <a 
+          href={`/?personal=${personal.id}`}
+          class="inline-flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+        >
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to all personals
+        </a>
+      </div>
+
+      <!-- Personal Card -->
+      <article class="personal-card max-w-3xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <span class="text-sm text-gray-700 dark:text-gray-300 tracking-wide uppercase font-mono">{byline}</span>
+        </div>
+        
+        <h1 class="font-serif text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-6 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
+          {getHeadline(personal)}
+        </h1>
+        
+        <div class="prose prose-lg dark:prose-invert max-w-none mb-8">
+          <p class="text-lg text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap font-sans" style="font-family: 'Inter', system-ui, sans-serif;">
+            {personal.personal}
+          </p>
+        </div>
+
+        <!-- Categories -->
+        <div class="mb-8">
+          <div class="flex flex-wrap gap-2">
+            {personal.categories.map((cat) => (
+              <span class="personal-tag">{cat}</span>
+            ))}
+          </div>
+        </div>
+
+        <!-- Contact Button -->
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-8">
+          <div class="flex flex-col sm:flex-row gap-4">
+            <a
+              href={personal.contact}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="personal-respond"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+              Respond to this personal
+            </a>
+            <button
+              id="share-button"
+              class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 font-semibold rounded-lg transition-colors"
+            >
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+              </svg>
+              Share Link
+            </button>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <Footer />
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const shareButton = document.getElementById('share-button');
+      if (!shareButton) return;
+      
+      shareButton.addEventListener('click', function() {
+        const url = window.location.href;
+        const button = this;
+        const originalText = button.innerHTML;
+        const originalClasses = button.className;
+        
+        // Try native share API first (mobile devices)
+        if (navigator.share) {
+          navigator.share({
+            title: 'Queer Jews Personal',
+            text: 'Check out this personal ad on Queer Jews',
+            url: url
+          }).catch((error) => {
+            console.log('Share cancelled or failed:', error);
+            // Fall back to clipboard copy
+            copyToClipboard();
+          });
+        } else {
+          // Desktop fallback: copy to clipboard
+          copyToClipboard();
+        }
+        
+        function copyToClipboard() {
+          navigator.clipboard.writeText(url).then(() => {
+            // Show success state
+            button.innerHTML = `
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Copied!
+            `;
+            button.className = 'inline-flex items-center justify-center px-6 py-3 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 text-green-700 dark:text-green-300 font-semibold rounded-lg transition-colors';
+            
+            // Reset after 2 seconds
+            setTimeout(() => {
+              button.innerHTML = originalText;
+              button.className = originalClasses;
+            }, 2000);
+          }).catch((error) => {
+            console.error('Failed to copy to clipboard:', error);
+            // Fallback for older browsers
+            fallbackCopy();
+          });
+        }
+        
+        function fallbackCopy() {
+          // Create temporary textarea for older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = url;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          try {
+            document.execCommand('copy');
+            // Show success state
+            button.innerHTML = `
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Copied!
+            `;
+            button.className = 'inline-flex items-center justify-center px-6 py-3 bg-green-100 hover:bg-green-200 dark:bg-green-900 dark:hover:bg-green-800 text-green-700 dark:text-green-300 font-semibold rounded-lg transition-colors';
+            
+            setTimeout(() => {
+              button.innerHTML = originalText;
+              button.className = originalClasses;
+            }, 2000);
+          } catch (error) {
+            console.error('Fallback copy failed:', error);
+            // Show error state
+            button.innerHTML = `
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Failed
+            `;
+            button.className = 'inline-flex items-center justify-center px-6 py-3 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:hover:bg-red-800 text-red-700 dark:text-red-300 font-semibold rounded-lg transition-colors';
+            
+            setTimeout(() => {
+              button.innerHTML = originalText;
+              button.className = originalClasses;
+            }, 2000);
+          } finally {
+            document.body.removeChild(textArea);
+          }
+        }
+      });
+    });
+  </script>
+</Layout> 

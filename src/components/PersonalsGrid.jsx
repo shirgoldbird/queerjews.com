@@ -1,6 +1,28 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 
+// Function to get URL parameters
+function getUrlParameter(name) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(name);
+}
+
+// Function to scroll to element with smooth animation
+function scrollToElement(elementId) {
+  const element = document.getElementById(elementId);
+  if (element) {
+    element.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'center' 
+    });
+    // Add highlight effect
+    element.classList.add('highlight-personal');
+    setTimeout(() => {
+      element.classList.remove('highlight-personal');
+    }, 3000);
+  }
+}
+
 function formatDate(dateStr) {
   // Parse date as local date to avoid timezone issues
   const [year, month, day] = dateStr.split('-').map(Number);
@@ -21,12 +43,25 @@ export default function PersonalsGrid({ personals }) {
   const [location, setLocation] = useState('');
   const [filtersVisible, setFiltersVisible] = useState(false);
   const [locationMessageDismissed, setLocationMessageDismissed] = useState(false);
+  const [highlightedPersonal, setHighlightedPersonal] = useState(null);
 
   // Check if location message was previously dismissed
   useEffect(() => {
     const dismissed = localStorage.getItem('locationMessageDismissed');
     if (dismissed === 'true') {
       setLocationMessageDismissed(true);
+    }
+  }, []);
+
+  // Handle deep linking to specific personal
+  useEffect(() => {
+    const personalId = getUrlParameter('personal');
+    if (personalId) {
+      setHighlightedPersonal(personalId);
+      // Scroll to the personal after a short delay to ensure DOM is ready
+      setTimeout(() => {
+        scrollToElement(personalId);
+      }, 100);
     }
   }, []);
 
@@ -231,15 +266,27 @@ export default function PersonalsGrid({ personals }) {
         )}
         {filtered.map(personal => {
           const headline = getHeadline(personal);
-          // Handle both new location arrays and legacy single location
-          const locationText = Array.isArray(personal.locations) 
-            ? personal.locations.join(', ').toUpperCase()
-            : (personal.location ? personal.location.toUpperCase() : null);
+          const locationText = personal.locations.join(', ').toUpperCase();
           const byline = [locationText, formatDate(personal.date_posted)].filter(Boolean).join(' • ');
+          const isHighlighted = highlightedPersonal === personal.id;
+          
           return (
-            <article class="personal-card" key={personal.id}>
-              <div class="flex items-center justify-between mb-2">
+            <article 
+              id={personal.id}
+              class={`personal-card ${isHighlighted ? 'highlight-personal' : ''}`} 
+              key={personal.id}
+            >
+              <div class="flex items-start justify-between mb-2">
                 <span class="text-xs text-gray-700 dark:text-gray-300 tracking-wide uppercase font-mono">{byline}</span>
+                <a
+                  href={`/personal/${personal.id.replace('personal-', '')}`}
+                  class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors flex-shrink-0 ml-2"
+                  title="View details"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
               </div>
               <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
                 {headline}
@@ -249,12 +296,9 @@ export default function PersonalsGrid({ personals }) {
               </p>
               <div class="personal-bottom-row">
                 <div class="flex flex-wrap gap-2">
-                  {Array.isArray(personal.categories)
-                    ? personal.categories.map((cat) => (
-                        <span class="personal-tag" key={cat}>{cat}</span>
-                      ))
-                    : personal.category && <span class="personal-tag">{personal.category}</span>
-                  }
+                  {personal.categories.map((cat) => (
+                    <span class="personal-tag" key={cat}>{cat}</span>
+                  ))}
                 </div>
                 <a
                   href={personal.contact}
@@ -263,7 +307,7 @@ export default function PersonalsGrid({ personals }) {
                   class="personal-respond"
                 >
                   <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                   Respond
                 </a>
