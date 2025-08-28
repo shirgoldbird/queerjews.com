@@ -1,5 +1,6 @@
 import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
+import PersonalCard from './PersonalCard.jsx';
 
 // Function to get URL parameters
 function getUrlParameter(name) {
@@ -21,19 +22,6 @@ function scrollToElement(elementId) {
       element.classList.remove('highlight-personal');
     }, 3000);
   }
-}
-
-function formatDate(dateStr) {
-  // Parse date as local date to avoid timezone issues
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const date = new Date(year, month - 1, day); // month is 0-indexed
-  return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-function getHeadline(personal) {
-  if (personal.title) return personal.title;
-  const words = personal.personal.split(' ');
-  return words.slice(0, 8).join(' ') + (words.length > 8 ? '...' : '');
 }
 
 export default function PersonalsGrid({ personals }) {
@@ -265,54 +253,17 @@ export default function PersonalsGrid({ personals }) {
           <div class="col-span-2 text-center py-12 text-gray-500 dark:text-gray-400">No personals found.</div>
         )}
         {filtered.map(personal => {
-          const headline = getHeadline(personal);
-          const locationText = personal.locations.join(', ').toUpperCase();
-          const byline = [locationText, formatDate(personal.date_posted)].filter(Boolean).join(' • ');
           const isHighlighted = highlightedPersonal === personal.id;
           
           return (
-            <article 
-              id={personal.id}
-              class={`personal-card ${isHighlighted ? 'highlight-personal' : ''}`} 
+            <PersonalCard
               key={personal.id}
-            >
-              <div class="flex items-start justify-between mb-2">
-                <span class="text-xs text-gray-700 dark:text-gray-300 tracking-wide uppercase font-mono">{byline}</span>
-                <a
-                  href={`/personal/${personal.id.replace('personal-', '')}`}
-                  class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors flex-shrink-0 ml-2"
-                  title="View details"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                </a>
-              </div>
-              <h2 class="font-serif text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 leading-tight tracking-tight" style="font-family: 'Playfair Display', serif; text-transform: uppercase; letter-spacing: 0.02em;">
-                {headline}
-              </h2>
-              <p class="text-base text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap font-sans" style="font-family: 'Inter', system-ui, sans-serif;">
-                {personal.personal}
-              </p>
-              <div class="personal-bottom-row">
-                <div class="flex flex-wrap gap-2">
-                  {personal.categories.map((cat) => (
-                    <span class="personal-tag" key={cat}>{cat}</span>
-                  ))}
-                </div>
-                <a
-                  href={personal.contact}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="personal-respond"
-                >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                  </svg>
-                  Respond
-                </a>
-              </div>
-            </article>
+              personal={personal}
+              variant="grid"
+              showLinkIcon={true}
+              showRespondButton={true}
+              isHighlighted={isHighlighted}
+            />
           );
         })}
       </div>
