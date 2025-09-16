@@ -10,12 +10,22 @@ function getUrlParameter(name) {
 
 // Function to update URL without query parameters (except personal for deep linking)
 function updateUrlWithoutQueryParams() {
-  const personalId = getUrlParameter('personal');
-  const newUrl = personalId ? `/?personal=${personalId}` : '/';
+  const urlParams = new URLSearchParams(window.location.search);
+  const personalId = urlParams.get('personal');
   
-  // Only update URL if it's different from current
-  if (window.location.pathname + window.location.search !== newUrl) {
-    window.history.replaceState({}, '', newUrl);
+  // Only update URL if there are other query parameters besides 'personal'
+  const hasOtherParams = Array.from(urlParams.keys()).some(key => key !== 'personal');
+  
+  if (hasOtherParams) {
+    // Remove 'personal-' prefix from URL parameter for consistency
+    const cleanPersonalId = personalId ? personalId.replace('personal-', '') : null;
+    const newUrl = cleanPersonalId ? `/?personal=${cleanPersonalId}` : '/';
+    
+    // Only update if the URL would actually change
+    const currentUrl = window.location.pathname + window.location.search;
+    if (currentUrl !== newUrl) {
+      window.history.replaceState({}, '', newUrl);
+    }
   }
 }
 
@@ -54,8 +64,10 @@ export default function PersonalsGrid({ personals }) {
 
   // Handle deep linking to specific personal
   useEffect(() => {
-    const personalId = getUrlParameter('personal');
-    if (personalId) {
+    const personalIdParam = getUrlParameter('personal');
+    if (personalIdParam) {
+      // Add 'personal-' prefix if it's not already there for consistency with the data
+      const personalId = personalIdParam.startsWith('personal-') ? personalIdParam : `personal-${personalIdParam}`;
       setHighlightedPersonal(personalId);
       // Scroll to the personal after a short delay to ensure DOM is ready
       setTimeout(() => {
