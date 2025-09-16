@@ -1,5 +1,6 @@
 ---
 import JumpToTop from '../components/JumpToTop.astro';
+import Analytics from '../components/Analytics.astro';
 
 export interface Props {
   title: string;
@@ -105,6 +106,9 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     
     <!-- Jump to Top Button -->
     <JumpToTop />
+    
+    <!-- Analytics -->
+    <Analytics />
     
     
     <!-- Remove theme loading class after page loads -->

@@ -47,7 +47,7 @@ npm run setup
 4. Create a `.env` file:
 ```bash
 cp .env.example .env
-# Edit .env with your spreadsheet ID and credentials
+# Edit .env with your spreadsheet ID, credentials, and optionally Google Analytics ID
 ```
 
 5. Start development:
